@@ -36,5 +36,6 @@ void destruirCompanhia(Companhia*);
 void imprimirCompanhia(Companhia*);
 Companhia **lerTodosNumFixo(FILE *,int*);
 Companhia *criarCompanhia();
+int possuiCampoProcurado(Companhia *, Campo, char *);
 
 #endif

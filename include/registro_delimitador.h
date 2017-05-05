@@ -13,6 +13,5 @@ Companhia **buscarCampoDelimitador(FILE *in, Campo campo, char *query, int *n_re
 Companhia *lerCompanhiaDelimitador(FILE *);
 Companhia *buscarNomeDelimitador(FILE *,char *);
 Companhia *buscarNumRegDelimitador(FILE *,int);
-int possuiCampoProcurado(Companhia *, Campo, char *);
 
 #endif
