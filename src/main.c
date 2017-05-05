@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <companhias.h>
+#include <registro_num_fixo_campos.h>
 #include <registro_delimitador.h>
 #include <registro_indicador_tamanho.h>
 
@@ -16,21 +17,21 @@ int main(int argc, char *argv[]){
 		destruirCompanhia(cs[i]);
 	free(cs);
 
-	s = lerTodosTamReg(output,&n_regs);
-	for (int i = 0; i < n_regs; ++i){
-		imprimirCompanhia(s[i]);
-		printf("--------------\n");
-	}
-
-	// c = buscarNumRegDelimitador(output,1);
-	// if(c){
-	// 	imprimirCompanhia(c);
-	// 	destruirCompanhia(c);
+	// s = lerTodosTamReg(output,&n_regs);
+	// for (int i = 0; i < n_regs; ++i){
+	// 	imprimirCompanhia(s[i]);
+	// 	printf("--------------\n");
 	// }
-	// else printf("Não Encontrado!\n");
+
+	c = buscarNumRegTamReg(output,2);
+	if(c){
+	 	imprimirCompanhia(c);
+	 	destruirCompanhia(c);
+	}
+	else printf("Não Encontrado!\n");
+	
 	// int count;
-	// //s = lerTodosDelimitador(output,&count);
-	// s = buscarCampoDelimitador(output, NOME_EMPRESA, "GRANT THORNTON AUDITORES INDEPENDENTES",&count);
+	// s = buscarCampoTamReg(output, NOME_SOCIAL, "521 PARTICIPAÇOES S.A. - EM LIQUIDAÇÃO EXTRAJUDICIAL",&count);
 	// printf("%d\n",count);
 	// for(int i=0;i<count;i++){
 	// 	printf("--------------------\n");

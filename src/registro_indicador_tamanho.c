@@ -19,7 +19,6 @@ char *lerAteDelimitadorTamReg(FILE *in,int*tam){
 		str[count++] = c;
 	}
 
-	printf("%d\n",*tam);
 	return str;
 }
 
@@ -39,7 +38,6 @@ Companhia** lerTodosTamReg(FILE *in, int *n_regs){
 	fseek(in,0,SEEK_SET);
 
 	while(ftell(in) < end){
-		printf("%d < %d\n",(int) ftell(in),end);
 		companhias = realloc(companhias,sizeof(Companhia*)*(count+1));
 		companhias[count++] = lerCompanhiaTamReg(in);
 	}
@@ -55,8 +53,6 @@ Companhia *lerCompanhiaTamReg(FILE *in){
 	int tamanho_registro;
 
 	tamanho_registro = getTamanhoTamReg(in);
-
-	if(tamanho_registro < 7) return NULL;
 
 	companhia->cnpj = lerAteDelimitadorTamReg(in,&tamanho_registro);
 	companhia->nome_social = lerAteDelimitadorTamReg(in,&tamanho_registro);
@@ -96,7 +92,7 @@ Companhia **buscarCampoTamReg(FILE *in, Campo campo, char *query, int *n_regs){
 /* Busca por um registro atráves do seu numero, e o retorna */
 Companhia *buscarNumRegTamReg(FILE *in, int query){
 	Companhia *companhia = NULL;
-	int tam,end,found = 0;
+	int tam,end;
 	int count = 0;
 
 	fseek(in,0,SEEK_END);
@@ -107,28 +103,34 @@ Companhia *buscarNumRegTamReg(FILE *in, int query){
 	while(ftell(in) < end){
 		if(++count == query){
 			companhia = lerCompanhiaTamReg(in);
-			found = 1;
 			continue;
 		}else{
 			tam = getTamanhoTamReg(in);
-			fseek(in,tam,SEEK_SET);
+			fseek(in,tam,SEEK_CUR);
 		}
-		destruirCompanhia(companhia);
 	}
-	return found ? companhia : NULL;
+	return companhia;
 }
 
 int getTamanhoCompanhia(Companhia *companhia){
 	int tam = 0;
 
-	if(companhia->cnpj)tam += strlen(companhia->cnpj) + 2;
-	if(companhia->nome_social)tam += strlen(companhia->nome_social) + 2;
-	if(companhia->nome_fantasia)tam += strlen(companhia->nome_fantasia) + 2;
-	if(companhia->data_registro)tam += strlen(companhia->data_registro) + 2;
-	if(companhia->data_cancelamento)tam += strlen(companhia->data_cancelamento) + 2;
-	if(companhia->motivo_cancelamento)tam += strlen(companhia->motivo_cancelamento) + 2;
-	if(companhia->nome_empresa)tam += strlen(companhia->nome_empresa) + 2;
-	if(companhia->cnpj_auditoria)tam += strlen(companhia->cnpj_auditoria) + 2;
+	if(companhia->cnpj)tam += strlen(companhia->cnpj) + 1;
+	tam++;
+	if(companhia->nome_social)tam += strlen(companhia->nome_social) + 1;
+	tam++;
+	if(companhia->nome_fantasia)tam += strlen(companhia->nome_fantasia) + 1;
+	tam++;
+	if(companhia->data_registro)tam += strlen(companhia->data_registro) + 1;
+	tam++;
+	if(companhia->data_cancelamento)tam += strlen(companhia->data_cancelamento) + 1;
+	tam++;
+	if(companhia->motivo_cancelamento)tam += strlen(companhia->motivo_cancelamento) + 1;
+	tam++;
+	if(companhia->nome_empresa)tam += strlen(companhia->nome_empresa) + 1;
+	tam++;
+	if(companhia->cnpj_auditoria)tam += strlen(companhia->cnpj_auditoria) + 1;
+	tam++;
 
 	return tam;
 }

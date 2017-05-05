@@ -35,7 +35,6 @@ Companhia** lerTodosNumFixo(FILE *in, int* n_regs){
 		companhias[count++] = lerCompanhiaNumFixo(in);
 	}
 
-
 	*n_regs = count;
 	return companhias;
 }
