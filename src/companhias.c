@@ -45,6 +45,44 @@ void imprimirCompanhia(Companhia *companhia){
 	if(companhia->cnpj_auditoria) printf("CNPJ AUDITORIA: %s\n",companhia->cnpj_auditoria);
 }
 
+/* Checa se o uma compania tem um campo igual a uma query */
+int possuiCampoProcurado(Companhia *companhia, Campo campo, char *query){
+	if(campo == CNPJ){
+		if(companhia->cnpj && !strcmp(companhia->cnpj,query)) return 1;
+		return 0;
+	}
+	else if(campo == NOME_SOCIAL){
+		if(companhia->nome_social && !strcmp(companhia->nome_social,query)) return 1;
+		return 0;
+	}
+	else if(campo == NOME_FANTASIA){
+		if(companhia->nome_fantasia && !strcmp(companhia->nome_fantasia,query)) return 1;
+		return 0;	
+	}
+	else if(campo == DATA_REGISTRO){
+		if(companhia->data_registro && !strcmp(companhia->data_registro,query)) return 1;
+		return 0;
+	}
+	else if(campo == DATA_CANCELAMENTO){
+		if(companhia->data_cancelamento && !strcmp(companhia->data_cancelamento,query)) return 1;
+		return 0;
+	}
+	else if(campo == MOTIVO_CANCELAMENTO){
+		if(companhia->motivo_cancelamento && !strcmp(companhia->motivo_cancelamento,query)) return 1;
+		return 0;
+	}
+	else if(campo == NOME_EMPRESA){
+		if(companhia->nome_empresa && !strcmp(companhia->nome_empresa,query)) return 1;
+		return 0;
+	}
+	else if(campo == CNPJ_AUDITORIA){
+		if(companhia->cnpj_auditoria && !strcmp(companhia->cnpj_auditoria,query)) return 1;
+		return 0;
+	}
+	return 0;
+}
+
+
 /* Recebe um ponteiro para arquivo csv e lê um registro */
 Companhia *lerCompanhiaCSV(FILE *input_file){
 	Companhia *nova_companhia = criarCompanhia(1);
