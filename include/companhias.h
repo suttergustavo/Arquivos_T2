@@ -7,6 +7,8 @@ typedef struct Companhia Companhia;
 #define TAMANHO_CNPJ 19
 #define TAMANHO_DATA 11
 
+#define DELIM_FIM_CAMPO '|'
+#define DELIM_FIM_REG '#'
 
 typedef enum{
 	CNPJ,
@@ -31,6 +33,7 @@ struct Companhia{
 };
 
 
+char *getCampoCompanhia(Companhia *,Campo);
 Companhia **lerCSVCompleto(char *,int *);
 void destruirCompanhia(Companhia*);
 void imprimirCompanhia(Companhia*);

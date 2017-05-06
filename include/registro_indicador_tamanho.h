@@ -3,12 +3,10 @@
 
 #include <companhias.h>
 
-#define DELIM_FIM_CAMPO '|'
-
 void escreverCompanhiaTamReg(FILE*,Companhia*);
-Companhia **lerTodosTamReg(FILE *in, int* n_regs);
-Companhia **buscarCampoTamReg(FILE *in, Campo campo, char *query, int *n_regs);
-Companhia *lerCompanhiaTamReg(FILE *);
 Companhia *buscarNumRegTamReg(FILE *,int);
+Companhia *lerCompanhiaTamReg(FILE *);
+Companhia **buscarCampoTamReg(FILE *in, Campo campo, char *query, int *n_regs);
+Companhia **lerTodosTamReg(FILE *in, int* n_regs);
 
 #endif

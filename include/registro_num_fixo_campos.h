@@ -3,12 +3,10 @@
 
 #include <companhias.h>
 
-#define DELIM_FIM_CAMPO '|'
-
 void escreverCompanhiaNumFixo(FILE*,Companhia*);
+Companhia *buscarNumRegNumFixo(FILE *,int);
 Companhia *lerCompanhiaNumFixo(FILE *);
 Companhia **buscarCampoNumFixo(FILE *,Campo , char *,int *);
-Companhia *buscarNumRegNumFixo(FILE *,int);
-
+Companhia **lerTodosNumFixo(FILE *, int*);
 
 #endif

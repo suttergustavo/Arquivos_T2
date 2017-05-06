@@ -7,7 +7,7 @@
 char *lerAteDelimitadorTamReg(FILE *in,int*tam){
 	char c,*str = NULL;
 	int count = 0;
-	while(*tam > 0){
+	while(*tam > 0){ //le enquanto não achar um fim de campo ou o registro não acabar
 		fread(&c,sizeof(char),1,in);
 		(*tam)--;
 		if(c == EOF){
@@ -18,10 +18,10 @@ char *lerAteDelimitadorTamReg(FILE *in,int*tam){
 		str = (char *) realloc(str,sizeof(char)*(count + 1));
 		str[count++] = c;
 	}
-
 	return str;
 }
 
+/* Le o tamanho do proximo registro no arquivo  */
 int getTamanhoTamReg(FILE *in){
 	int tamanho_registro;
 	fread(&tamanho_registro,sizeof(int),1,in);
@@ -37,13 +37,14 @@ Companhia** lerTodosTamReg(FILE *in, int *n_regs){
 	end = (int) ftell(in);
 	fseek(in,0,SEEK_SET);
 
-	while(ftell(in) < end){
+	while(ftell(in) < end){ //enquanto o arquivo não chegar no fim
+		//le e armazena os registros
 		companhias = realloc(companhias,sizeof(Companhia*)*(count+1));
 		companhias[count++] = lerCompanhiaTamReg(in);
 	}
 
 
-	*n_regs = count;
+	*n_regs = count; //numero de registros que serão retornados
 	return companhias;
 }
 
@@ -52,8 +53,9 @@ Companhia *lerCompanhiaTamReg(FILE *in){
 	Companhia *companhia = criarCompanhia(0);
 	int tamanho_registro;
 
-	tamanho_registro = getTamanhoTamReg(in);
+	tamanho_registro = getTamanhoTamReg(in); //pega tamanho do registro
 
+	//le cada campo do registro
 	companhia->cnpj = lerAteDelimitadorTamReg(in,&tamanho_registro);
 	companhia->nome_social = lerAteDelimitadorTamReg(in,&tamanho_registro);
 	companhia->nome_fantasia = lerAteDelimitadorTamReg(in,&tamanho_registro);
@@ -76,16 +78,18 @@ Companhia **buscarCampoTamReg(FILE *in, Campo campo, char *query, int *n_regs){
 	fseek(in,0,SEEK_SET);
 
 	while(ftell(in) < end){
-		companhia = lerCompanhiaTamReg(in);
-		if(possuiCampoProcurado(companhia,campo,query)){
+		companhia = lerCompanhiaTamReg(in); //le o proximo registro
+		if(possuiCampoProcurado(companhia,campo,query)){ //caso seja o procura
+			//armazena no vetor que será retornado
 			companhias = (Companhia**) realloc(companhias,sizeof(Companhia*)*(count+1));
 			companhias[count++] = companhia;
 		}else{
+			//caso contrario não é preciso armazena-lo
 			destruirCompanhia(companhia);
 		}
 	}
 
-	*n_regs = count;
+	*n_regs = count; //numero de registros que sera retornado
 	return companhias;
 }
 
@@ -101,20 +105,22 @@ Companhia *buscarNumRegTamReg(FILE *in, int query){
 
 
 	while(ftell(in) < end){
-		if(++count == query){
-			companhia = lerCompanhiaTamReg(in);
-			continue;
-		}else{
-			tam = getTamanhoTamReg(in);
-			fseek(in,tam,SEEK_CUR);
+		if(++count == query){ //caso esteja no registro de procurado
+			companhia = lerCompanhiaTamReg(in); //armazena o registro
+			break;
+		}else{ //caso contrario
+			tam = getTamanhoTamReg(in); //le o tamanho registro atual
+			fseek(in,tam,SEEK_CUR); //vai para o proximo registro
 		}
 	}
 	return companhia;
 }
 
+/* Retorna o tamanho do registro*/
 int getTamanhoCompanhia(Companhia *companhia){
 	int tam = 0;
 
+	//soma cada campo(caso exista) e os delimitadores entre campos
 	if(companhia->cnpj)tam += strlen(companhia->cnpj) + 1;
 	tam++;
 	if(companhia->nome_social)tam += strlen(companhia->nome_social) + 1;
@@ -139,10 +145,11 @@ int getTamanhoCompanhia(Companhia *companhia){
 void escreverCompanhiaTamReg(FILE *out, Companhia *companhia){
 	char delim_fim_campo = DELIM_FIM_CAMPO;
 
-	int tam = getTamanhoCompanhia(companhia);
+	int tam = getTamanhoCompanhia(companhia); //recupera o tamanho do registro
 
-	fwrite(&tam,sizeof(int),1,out);
+	fwrite(&tam,sizeof(int),1,out); //escreve o tamanho do registro
 
+	//escreve cada campo utilizando o delimidor entre eles
 	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
 	fwrite(&delim_fim_campo,sizeof(char),1,out);
 	
