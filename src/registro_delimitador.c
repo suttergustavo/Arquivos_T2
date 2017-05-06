@@ -1,13 +1,13 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-
 #include <registro_delimitador.h>
 
+/* Le até encontrar um delimitador(retorna por referencia qual delimitador fez parar)*/
 char *lerAteDelimitadorRegistro(FILE *in, char *delimitador){
 	char c,*str = NULL;
 	int count = 0;
-	while(1){
+	while(1){//le até achar um delimitador
 		fread(&c,sizeof(char),1,in);
 		if(c == EOF){
 			free(str);
@@ -19,15 +19,17 @@ char *lerAteDelimitadorRegistro(FILE *in, char *delimitador){
 		str[count++] = c;
 	}
 
-	(*delimitador) = c;
+	(*delimitador) = c; //"retorna" via variavel passada por referencia qual delimitador foi encontrado
 
 	return str;
 }
 
+/* Escreve um registro em um arquivo usando o metodo de delimitador entre registros */
 void escreverCompanhiaDelimitador(FILE *out,Companhia *companhia) {
 	char delim_fim_campo = DELIM_FIM_CAMPO;
 	char delim_fim_reg = DELIM_FIM_REG;
 
+	//escree cada campo e um delimitador entre eles
 	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
 	fwrite(&delim_fim_campo,sizeof(char),1,out);
 	
@@ -52,6 +54,7 @@ void escreverCompanhiaDelimitador(FILE *out,Companhia *companhia) {
 	if(companhia->cnpj_auditoria) fwrite(companhia->cnpj_auditoria,sizeof(char),strlen(companhia->cnpj_auditoria)+1,out);
 	fwrite(&delim_fim_campo,sizeof(char),1,out);
 
+	//escreve delimitador de fim de registro
 	fwrite(&delim_fim_reg, sizeof(char), 1, out); // escreve o delimitador de registro '#'
 }
 
@@ -63,14 +66,14 @@ Companhia** lerTodosDelimitador(FILE *in, int* n_regs){
 	fseek(in,0,SEEK_END);
 	end = (int) ftell(in);
 	fseek(in,0,SEEK_SET);
-
-	while(ftell(in) < end){
+ 
+	while(ftell(in) < end){//enquanto não chegar no fim do arquivo
 		companhias = realloc(companhias,sizeof(Companhia*)*(count+1));
 		companhias[count++] = lerCompanhiaDelimitador(in);
 	}
 
 
-	*n_regs = count;
+	*n_regs = count; //numero de registros que serão retornados
 	return companhias;
 }
 
@@ -102,6 +105,7 @@ Companhia *lerCompanhiaDelimitador(FILE *in){
 	Companhia *companhia = criarCompanhia(0);
 	char delimitador;
 	
+	//le cada campo e checa se chegou no fim do registro
 	companhia->cnpj = lerAteDelimitadorRegistro(in, &delimitador);
 	if (delimitador == DELIM_FIM_REG) return companhia;
 	companhia->nome_social = lerAteDelimitadorRegistro(in, &delimitador);
@@ -125,30 +129,11 @@ Companhia *lerCompanhiaDelimitador(FILE *in){
 	return NULL;
 }
 
-/* Busca por um registro atráves do nome fantasia, e o retorna */
-Companhia *buscarNomeDelimitador(FILE *in, char *query){
-	Companhia *companhia;
-	int end,found = 0;
-
-	fseek(in,0,SEEK_END);
-	end = (int) ftell(in);
-	fseek(in,0,SEEK_SET);
-
-	while(ftell(in) < end){
-		companhia = lerCompanhiaDelimitador(in);
-		if(companhia->nome_fantasia && !strcmp(companhia->nome_fantasia,query)){
-			found = 1;
-			continue;
-		}
-		destruirCompanhia(companhia);
-	}
-	return found ? companhia : NULL;
-}
 
 /* Busca por um registro atráves do seu numero, e o retorna */
 Companhia *buscarNumRegDelimitador(FILE *in, int query){
 	Companhia *companhia = NULL;
-	int end,found = 0;
+	int end;
 	int count = 0;
 
 	fseek(in,0,SEEK_END);
@@ -156,13 +141,13 @@ Companhia *buscarNumRegDelimitador(FILE *in, int query){
 	fseek(in,0,SEEK_SET);
 
 
-	while(ftell(in) < end){
-		companhia = lerCompanhiaDelimitador(in);
-		if(count++ == query){
-			found = 1;
-			continue;
-		}
-		destruirCompanhia(companhia);
+	while(ftell(in) < end){ //enquanto não chegou no fim do arquivo
+		companhia = lerCompanhiaDelimitador(in); //le a companhia
+		if(++count == query) //caso seja a procurada
+			break;
+		destruirCompanhia(companhia); //caso não seja não é preciso armazena-la
+		companhia = NULL;
 	}
-	return found ? companhia : NULL;
+
+	return companhia;
 }

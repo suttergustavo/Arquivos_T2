@@ -9,7 +9,7 @@ Companhia *criarCompanhia(int flag_alocar){
 	Companhia *nova_companhia = (Companhia *) calloc(1,sizeof(Companhia));
 
 	//aloca memoria para os campos de tamanho fixo
-	if(flag_alocar){
+	if(flag_alocar == 1){
 		nova_companhia->cnpj = (char *) malloc(TAMANHO_CNPJ * sizeof(char));
 		nova_companhia->cnpj_auditoria = (char *) malloc(TAMANHO_CNPJ * sizeof(char));
 		nova_companhia->data_registro = (char *) malloc(TAMANHO_DATA * sizeof(char));
@@ -43,6 +43,19 @@ void imprimirCompanhia(Companhia *companhia){
 	if(companhia->motivo_cancelamento) printf("MOTIVO CANCELAMENTO: %s\n",companhia->motivo_cancelamento);
 	if(companhia->nome_empresa) printf("NOME EMPRESA: %s\n",companhia->nome_empresa);
 	if(companhia->cnpj_auditoria) printf("CNPJ AUDITORIA: %s\n",companhia->cnpj_auditoria);
+}
+
+/* Retorna um determinado campo de uma companhia */
+char *getCampoCompanhia(Companhia *companhia, Campo campo){
+	if(campo == CNPJ) return companhia->cnpj;
+	if(campo == NOME_SOCIAL) return companhia->nome_social;
+	if(campo == NOME_FANTASIA) return companhia->nome_fantasia;
+	if(campo == DATA_REGISTRO) return companhia->data_registro;
+	if(campo == DATA_CANCELAMENTO) return companhia->data_cancelamento;
+	if(campo == MOTIVO_CANCELAMENTO) return companhia->motivo_cancelamento;
+	if(campo == NOME_EMPRESA) return companhia->nome_empresa;
+	if(campo == CNPJ_AUDITORIA) return companhia->cnpj_auditoria;
+	return NULL;
 }
 
 /* Checa se o uma compania tem um campo igual a uma query */
@@ -161,5 +174,4 @@ Companhia **lerCSVCompleto(char *filename, int *n_companhias){
 
 	*n_companhias = count;
 	return companhias;
-
 }

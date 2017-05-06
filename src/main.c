@@ -1,47 +1,36 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <companhias.h>
-#include <registro_delimitador.h>
+#include <manipulacao_arquivos.h>
 
 int main(int argc, char *argv[]){
-	FILE *output = fopen("out","ab+");
-	Companhia *c,**cs,**s;
+	Companhia **cs,*c;
 	int n_regs;
 
 	cs = lerCSVCompleto("in",&n_regs);
 	for(int i=0;i<n_regs;i++)
-		escreverCompanhiaDelimitador(output,cs[i]);
+		escreverCompanhia("out",cs[i],DELIMITADOR_REGISTROS);
 	for(int i=0;i<n_regs;i++)
 		destruirCompanhia(cs[i]);
 	free(cs);
 
-	c = buscarNomeDelimitador(output,"ABC COMPUTADORES");
-	if(c){
-		imprimirCompanhia(c);
-		destruirCompanhia(c);
+	cs = buscarPorCampo("out",NOME_SOCIAL,"521 PARTICIPAÇOES S.A. - EM LIQUIDAÇÃO EXTRAJUDICIAL",&n_regs,DELIMITADOR_REGISTROS);
+	for(int i=0;i<n_regs;++i){
+		imprimirCompanhia(cs[i]);
+		destruirCompanhia(cs[i]);
 	}
-	else printf("Não Encontrado!\n");
+	free(cs);
 
-	c = buscarNumRegDelimitador(output,1);
-	if(c){
-		imprimirCompanhia(c);
-		destruirCompanhia(c);
+	c = buscarPorPosicao("out",2,DELIMITADOR_REGISTROS);
+	if(c)imprimirCompanhia(c);
+	else printf("nao\n");
+	if(c)destruirCompanhia(c);
+
+	cs = lerTodasCompanhias("out",&n_regs, DELIMITADOR_REGISTROS);
+	for(int i=0; i<n_regs; ++i){
+		imprimirCompanhia(cs[i]);
+		printf("------------\n");
+		destruirCompanhia(cs[i]);
 	}
-	else printf("Não Encontrado!\n");
-	int count;
-	//s = lerTodosDelimitador(output,&count);
-	s = buscarCampoDelimitador(output, NOME_EMPRESA, "GRANT THORNTON AUDITORES INDEPENDENTES",&count);
-	printf("%d\n",count);
-	for(int i=0;i<count;i++){
-		printf("--------------------\n");
-		imprimirCompanhia(s[i]);
-		printf("--------------------\n");
-	}
-	for(int i=0;i<count;i++)
-		destruirCompanhia(s[i]);
-	free(s);
-
-
-	fclose(output);
-
+	free(cs);
 }

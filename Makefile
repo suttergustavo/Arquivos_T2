@@ -1,7 +1,5 @@
 all:
 	gcc src/*.c -o prog -g -std=c99 -I./include -Wall
-clean:
-	rm out
 run:
 	./prog
 debug:
