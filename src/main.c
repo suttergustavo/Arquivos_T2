@@ -75,89 +75,15 @@ int main(){
 				printf("\n\n >>Opcao: ");
 				scanf("%d", &n_campo);
 			
-				if(n_campo == 1){
-				    printf("\n\n Digite o numero do CNPJ: ");
-				     scanf("%s", string_busca);
-				     cs = buscarPorCampo("out",CNPJ, string_busca,&n_regs,estrutura);
-				     for(i=0; i<n_regs; ++i){
-				         imprimirCompanhia(cs[i]);
-				         printf("------------\n");
-				         destruirCompanhia(cs[i]);
-				     }
-				     free(cs);
+				printf("\n\n Digite a chave de busca: ");
+				scanf("%s", string_busca);
+				cs = buscarPorCampo("out",n_campo, string_busca,&n_regs,estrutura);
+				for(i=0; i<n_regs; ++i){
+					imprimirCompanhia(cs[i]);
+					printf("------------\n");
+					destruirCompanhia(cs[i]);
 				}
-
-				if(n_campo == 2){
-					printf("\n\n Digite o Nome Social: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",NOME_SOCIAL, string_busca,&n_regs,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
-
-				if(n_campo == 3){
-					printf("\n\n Digite o Nome Fantasia: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",NOME_FANTASIA, string_busca,&n_regs,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
-
-				if(n_campo == 4){
-					printf("\n\n Digite a data de registro: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",DATA_REGISTRO, string_busca,&n_regs,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
-
-				if(n_campo == 5){
-					printf("\n\n Digite a data de cancelamento: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",DATA_CANCELAMENTO, string_busca,&n_regs,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
-
-				if(n_campo == 6){
-					printf("\n\n Digite o Nome da empresa: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",NOME_EMPRESA, string_busca,&n_regs,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
-
-				if(n_campo == 7){
-					printf("\n\n Digite o numero do CNPJ: ");
-					scanf("%s", string_busca);
-					cs = buscarPorCampo("out",CNPJ_AUDITORIA, string_busca, &n_regs ,estrutura);
-					for(i=0; i<n_regs; ++i){
-						imprimirCompanhia(cs[i]);
-						printf("------------\n");
-						destruirCompanhia(cs[i]);
-					}
-					free(cs);
-				}
+				free(cs);
 
 				printf("\n\n Deseja realizar mais peracoes?");
 				printf("\n\n 1- Sim");
@@ -186,7 +112,7 @@ int main(){
 				break;
 
 
-			case 5: //RETORNAR CAMPO DE REGISTRO POR POSIÇÃO
+			case 5: //RETORNAR CAMPO DE REGISTRO POR POSI
 				printf("\n\n Escolha o Campo: ");
 				printf("\n 1- CNPJ");
 				printf("\n 2- Nome Social");

@@ -11,7 +11,7 @@ typedef struct Companhia Companhia;
 #define DELIM_FIM_REG '#'
 
 typedef enum{
-	CNPJ,
+	CNPJ = 1,
 	NOME_SOCIAL,
 	NOME_FANTASIA,
 	DATA_REGISTRO,
