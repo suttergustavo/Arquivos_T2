@@ -4,9 +4,9 @@
 #include <companhias.h>
 
 typedef enum{
-	INDICADOR_TAMANHO,
-	NUMERO_FIXO_CAMPOS,
-	DELIMITADOR_REGISTROS
+	INDICADOR_TAMANHO = 1,
+	DELIMITADOR_REGISTROS,
+	NUMERO_FIXO_CAMPOS
 } Metodo;
 
 void escreverCompanhia(char *, Companhia *, Metodo);
