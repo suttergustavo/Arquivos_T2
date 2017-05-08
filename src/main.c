@@ -1,63 +1,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <companhias.h>
-<<<<<<< HEAD
-#include <registro_num_fixo_campos.h>
-#include <registro_delimitador.h>
-#include <registro_indicador_tamanho.h>
-
-int main(int argc, char *argv[]){
-	FILE *output = fopen("out","ab+");
-	Companhia *c,**cs,**s;
-	int n_regs;
-
-	cs = lerCSVCompleto("in",&n_regs);
-	for(int i=0;i<n_regs;i++)
-		escreverCompanhiaTamReg(output,cs[i]);
-	for(int i=0;i<n_regs;i++)
-		destruirCompanhia(cs[i]);
-	free(cs);
-
-	s = lerTodosTamReg(output,&n_regs);
-	for (int i = 0; i < n_regs; ++i){
-		imprimirCompanhia(s[i]);
-		printf("--------------\n");
-	}
-	for(int i=0;i<n_regs;i++)
-		destruirCompanhia(s[i]);
-	free(s);
-
-
-
-	c = buscarNumRegTamReg(output,2);
-	if(c){
-	 	imprimirCompanhia(c);
-	 	destruirCompanhia(c);
-	}
-	else printf("Não Encontrado!\n");
-	
-	int count;
-	s = buscarCampoTamReg(output, NOME_SOCIAL, "521 PARTICIPAÇOES S.A. - EM LIQUIDAÇÃO EXTRAJUDICIAL",&count);
-	for(int i=0;i<count;i++){
-		printf("--------------------\n");
-		imprimirCompanhia(s[i]);
-		printf("--------------------\n");
-	}
-	for(int i=0;i<count;i++)
-		destruirCompanhia(s[i]);
-	free(s);
-
-
-	fclose(output);
-
-}
-=======
 #include <manipulacao_arquivos.h>
 
 int main(){
     int op, estrutura, n_regs, i, j, nr, n_campo, loop = 1;
-    char string_busca[50];
+    char *string_busca;
     char *string_campo;
+    char string_nome_arquivo[20];
     Companhia **cs,*c;
 
     printf("\n Escolha uma estrutura: ");
@@ -81,7 +31,9 @@ int main(){
         switch(op){
 
         	case 1: //LER REGISTROS DE UM ARQUIVO CSV
-				cs = lerCSVCompleto("in",&n_regs);
+        		printf ("\nDigite o nome do arquivo: ");
+        		scanf ("%s", string_nome_arquivo);
+				cs = lerCSVCompleto(string_nome_arquivo,&n_regs);
         		for(i = 0; i < n_regs; i++)
         			escreverCompanhia("out",cs[i],estrutura);
         		for(j = 0;j < n_regs; j++)
@@ -127,13 +79,14 @@ int main(){
 				scanf("%d", &n_campo);
 			
 				printf("\n\n Digite a chave de busca: ");
-				scanf("%s", string_busca);
+				scanf("%ms", &string_busca);
 				cs = buscarPorCampo("out",n_campo, string_busca,&n_regs,estrutura);
 				for(i=0; i<n_regs; ++i){
 					imprimirCompanhia(cs[i]);
 					printf("------------\n");
 					destruirCompanhia(cs[i]);
 				}
+				free(string_busca);
 				free(cs);
 
 				printf("\n\n Deseja realizar mais peracoes?");
@@ -235,4 +188,3 @@ int main(){
 
 	return 0;
 }	
->>>>>>> ed120318324a0f97690e224551c074834fb9fd7d
