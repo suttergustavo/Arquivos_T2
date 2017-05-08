@@ -7,7 +7,7 @@
 char *lerAteDelimitador(FILE *in){
 	char c,*str = NULL;
 	int count = 0;
-	while(1){
+	while(1){ //le e armazena chars até encontrar um delimitador
 		fread(&c,sizeof(char),1,in);
 		if(c == EOF){
 			free(str);
@@ -30,12 +30,13 @@ Companhia** lerTodosNumFixo(FILE *in, int* n_regs){
 	end = (int) ftell(in);
 	fseek(in,0,SEEK_SET);
 
-	while(ftell(in) < end){
+	while(ftell(in) < end){//enquanto ainda não chegou no fim do arquivo
+		//guarda o registro lido em um vetor
 		companhias = realloc(companhias,sizeof(Companhia*)*(count+1));
-		companhias[count++] = lerCompanhiaNumFixo(in);
+		companhias[count++] = lerCompanhiaNumFixo(in); 
 	}
 
-	*n_regs = count;
+	*n_regs = count; //numero de registros que serão retornados
 	return companhias;
 }
 
@@ -43,7 +44,7 @@ Companhia** lerTodosNumFixo(FILE *in, int* n_regs){
 Companhia *lerCompanhiaNumFixo(FILE *in){
 	Companhia *companhia = criarCompanhia(0);
 	
-	
+	//para cada um dos campos realiza a leitura até encontrar um delimitador
 	companhia->cnpj = lerAteDelimitador(in);
 	companhia->nome_social = lerAteDelimitador(in);
 	companhia->nome_fantasia = lerAteDelimitador(in);
@@ -66,45 +67,45 @@ Companhia **buscarCampoNumFixo(FILE *in, Campo campo, char *query, int *n_regs){
 	fseek(in,0,SEEK_SET);
 
 	while(ftell(in) < end){
-		companhia = lerCompanhiaNumFixo(in);
-		if(possuiCampoProcurado(companhia,campo,query)){
-			companhias = (Companhia**) realloc(companhias,sizeof(Companhia*)*(count+1));
+		companhia = lerCompanhiaNumFixo(in); //le uma companhia
+		if(possuiCampoProcurado(companhia,campo,query)){ //checa se a companhia é a buscada
+			companhias = (Companhia**) realloc(companhias,sizeof(Companhia*)*(count+1)); //caso seja guarda no vetor que sera retornado
 			companhias[count++] = companhia;
 		}else{
-			destruirCompanhia(companhia);
+			destruirCompanhia(companhia); //caso contrario não é preciso armazena-la
 		}
 	}
 
-	*n_regs = count;
+	*n_regs = count; //"retorna" via passagem por referencia quantos registros serão retornados
 	return companhias;
 }
 
 /* Busca por um registro atráves do seu numero, e o retorna */
 Companhia *buscarNumRegNumFixo(FILE *in, int query){
 	Companhia *companhia = NULL;
-	int end,found = 0;
-	int count = 0;
+	int end;	int count = 0;
 
+	//pega o tamanho do arquivo onde sera realizada a busca
 	fseek(in,0,SEEK_END);
 	end = ftell(in);
 	fseek(in,0,SEEK_SET);
 
-
+	//vai de registro em registro procurando
 	while(ftell(in) < end){
 		companhia = lerCompanhiaNumFixo(in);
-		if(++count == query){
-			found = 1;
-			continue;
-		}
+		if(++count == query)
+			break;
 		destruirCompanhia(companhia);
+		companhia = NULL;
 	}
-	return found ? companhia : NULL;
+	return companhia;
 }
 
 /* Escreve uma companhia em um arquivo */
 void escreverCompanhiaNumFixo(FILE *out, Companhia *companhia){
 	char delim_fim_campo = DELIM_FIM_CAMPO;
 
+	//escreve os campos seguido de um delimitador
 	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
 	fwrite(&delim_fim_campo,sizeof(char),1,out);
 	
