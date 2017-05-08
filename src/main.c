@@ -127,17 +127,22 @@ int main(){
 
 
 			case 5: //RETORNAR CAMPO DE REGISTRO POR POSI
-				printf("\n\n Escolha o Campo: ");
-				printf("\n 1- CNPJ");
-				printf("\n 2- Nome Social");
-				printf("\n 3- Nome fantasia");
-				printf("\n 4- Data de registro");
-				printf("\n 5- Data de cancelamento");
-				printf("\n 6- Motivo de Cancelamento");
-				printf("\n 7- Nome da empresa");
-				printf("\n 8- CNPJ da empresa de auditoria");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &n_campo);
+				n_campo = 9;
+				while(n_campo > 8 || n_campo < 1){
+					printf("\n\n Escolha o Campo: ");
+					printf("\n 1- CNPJ");
+					printf("\n 2- Nome Social");
+					printf("\n 3- Nome fantasia");
+					printf("\n 4- Data de registro");
+					printf("\n 5- Data de cancelamento");
+					printf("\n 6- Motivo de Cancelamento");
+					printf("\n 7- Nome da empresa");
+					printf("\n 8- CNPJ da empresa de auditoria");
+					printf("\n\n >>Opcao: ");
+					scanf("%d", &n_campo);
+					if(n_campo > 8 || n_campo < 1)
+						printf("\n Opcao inválida, tente novamente.\n");
+				}
 				printf("\n\n Numero do Registro: ");
 				scanf("%d", &nr);
 				c = buscarPorPosicao(nome_arquivo_dados,nr,estrutura);
