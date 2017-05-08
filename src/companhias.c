@@ -158,8 +158,10 @@ Companhia **lerCSVCompleto(char *filename, int *n_companhias){
 	FILE *in;
 	Companhia **companhias = NULL;
 	int end,count = 0;
+	*n_companhias = 0;
 
 	in = fopen(filename,"r");
+	if(in == NULL) return NULL;
 
 	fseek(in,0,SEEK_END);
 	end = (int) ftell(in);

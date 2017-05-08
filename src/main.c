@@ -22,8 +22,8 @@ int main(){
         printf("\n\n 1- Fornecer arquivo de entrada para leitura de registros ");
         printf("\n 2- Recuperar todos os dados dos registros");
         printf("\n 3- Buscar por Campo ");
-        printf("\n 4- Buscar por Numero de Registro: ");
-        printf("\n 5- Busca por Campo espicifico de um Registro: ");
+        printf("\n 4- Buscar por Numero de Registro");
+        printf("\n 5- Busca por Campo espicifico de um Registro");
         printf("\n 0- Sair");
         printf("\n\n >>Opcao:  ");
         scanf("%d", &op);
@@ -31,69 +31,66 @@ int main(){
         switch(op){
 
         	case 1: //LER REGISTROS DE UM ARQUIVO CSV
-        		printf ("\nDigite o nome do arquivo: ");
+        		printf ("\n Digite o nome do arquivo: ");
         		scanf ("%s", string_nome_arquivo);
 				cs = lerCSVCompleto(string_nome_arquivo,&n_regs);
+				if(!cs){
+					printf("\n Arquivo não encontrado\n");
+				}
         		for(i = 0; i < n_regs; i++)
         			escreverCompanhia("out",cs[i],estrutura);
         		for(j = 0;j < n_regs; j++)
         	    	destruirCompanhia(cs[j]);
-        	    free(cs);
-
-				printf("\n\n Deseja realizar mais operacoes?");
-				printf("\n\n 1- Sim");
-				printf("\n 2- Nao");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &loop);
+        	    if(cs) free(cs);
 
             	break;
 
 			case 2: //LER TODAS AS COMPANHIAS DE UM ARQUIVO DE DADOS
 				cs = lerTodasCompanhias("out",&n_regs, estrutura);
+				if(!cs)
+					printf("\n Não encontrado\n");
+				
 				for(i=0; i<n_regs; ++i){
 					printf("\n\n");
 					imprimirCompanhia(cs[i]);
 					printf("------------\n");
 					destruirCompanhia(cs[i]);
 				}
-				free(cs);
-			
-				printf("\n\n Deseja realizar mais peracoes?");
-				printf("\n\n 1- Sim");
-				printf("\n 2- Nao");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &loop);
+				free(cs);	
 			
 				break;
 
 			case 3: //FAZER BUSCA POR CAMPO
-				printf("\n\n Escolha o Campo: ");
-				printf("\n 1- CNPJ");
-				printf("\n 2- Nome Social");
-				printf("\n 3- Nome fantasia");
-				printf("\n 4- Data de registro");
-				printf("\n 5- Data de cancelamento");
-				printf("\n 6- Nome da empresa");
-				printf("\n 7- CNPJ da empresa de auditoria");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &n_campo);
-			
+				n_campo = 9;
+				while(n_campo > 8 || n_campo < 1){
+					printf("\n\n Escolha o Campo: ");
+					printf("\n 1- CNPJ");
+					printf("\n 2- Nome Social");
+					printf("\n 3- Nome fantasia");
+					printf("\n 4- Data de registro");
+					printf("\n 5- Data de cancelamento");
+					printf("\n 6- Motivo de Cancelamento");
+					printf("\n 7- Nome da empresa");
+					printf("\n 8- CNPJ da empresa de auditoria");
+					printf("\n\n >>Opcao: ");
+					scanf("%d", &n_campo);
+					if(n_campo > 8 || n_campo < 1)
+						printf("\n Opcao inválida, tente novamente.\n");
+				}
 				printf("\n\n Digite a chave de busca: ");
-				scanf("%ms", &string_busca);
+				scanf("%*c%m[^\n]", &string_busca);
+				
 				cs = buscarPorCampo("out",n_campo, string_busca,&n_regs,estrutura);
+				if(n_regs == 0)
+					printf("\n Não encontrado.\n");
+				
 				for(i=0; i<n_regs; ++i){
 					imprimirCompanhia(cs[i]);
 					printf("------------\n");
 					destruirCompanhia(cs[i]);
-				}
+				} 
 				free(string_busca);
 				free(cs);
-
-				printf("\n\n Deseja realizar mais peracoes?");
-				printf("\n\n 1- Sim");
-				printf("\n 2- Nao");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &loop);
 
         	    break;
 
@@ -102,17 +99,11 @@ int main(){
 				scanf("%d", &nr);
 			
 				c = buscarPorPosicao("out",nr,estrutura);
-				if(c)imprimirCompanhia(c);
-				else printf("\n\n ***Nao foi possivel recuperar esse registro***");
-				printf("------------\n");
-				if(c)destruirCompanhia(c);
-			
-				printf("\n\n Deseja realizar mais peracoes?");
-				printf("\n 1- Sim");
-				printf("\n 2- Nao");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &loop);
-			
+				if(c) imprimirCompanhia(c);
+				else printf("\n Não encontrado\n");
+				
+				if(c) destruirCompanhia(c);
+						
 				break;
 
 
@@ -123,13 +114,18 @@ int main(){
 				printf("\n 3- Nome fantasia");
 				printf("\n 4- Data de registro");
 				printf("\n 5- Data de cancelamento");
-				printf("\n 6- Nome da empresa");
-				printf("\n 7- CNPJ da empresa de auditoria");
+				printf("\n 6- Motivo de Cancelamento");
+				printf("\n 7- Nome da empresa");
+				printf("\n 8- CNPJ da empresa de auditoria");
 				printf("\n\n >>Opcao: ");
 				scanf("%d", &n_campo);
 				printf("\n\n Numero do Registro: ");
 				scanf("%d", &nr);
 				c = buscarPorPosicao("out",nr,estrutura);
+				if(!c){
+					printf("\n Não encontrado\n");
+					break;
+				}
 
 				if(n_campo == 1){
 					string_campo = getCampoCompanhia(c, CNPJ);
@@ -164,18 +160,13 @@ int main(){
 				if(n_campo == 7){
 					string_campo = getCampoCompanhia(c, CNPJ_AUDITORIA);
 					printf("\n\n CNPJ da empresa de auditoria: %s", string_campo);
-				}
-
-				printf("\n\n Deseja realizar mais peracoes?");
-				printf("\n\n 1- Sim");
-				printf("\n 2- Nao");
-				printf("\n\n >>Opcao: ");
-				scanf("%d", &loop);
+				}	
 
 				break;
 
 			case 0:
-				exit(op);
+				loop = 0;
+				continue;
 
 			default:
 				printf("\n\n A opcao digitada esta incorreta, deseja tentar novamente?");
@@ -183,6 +174,17 @@ int main(){
 				printf("\n 0- Nao");
 				printf("\n\n >>Opcao: ");
 				scanf("%d", &loop);
+				continue;
+		}
+		loop = 0;
+		while(loop != 1 && loop != 2){
+			printf("\n\n Deseja realizar mais operacoes?");
+			printf("\n\n 1- Sim");
+			printf("\n 2- Nao");
+			printf("\n\n >>Opcao: ");
+			scanf("%d", &loop);
+			if(loop != 1 && loop != 2) 
+				printf("\n Opcao inválida.\n");
 		}
 	}
 
