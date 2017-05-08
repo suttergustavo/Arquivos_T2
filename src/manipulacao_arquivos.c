@@ -1,3 +1,13 @@
+/*
+Autores:
+
+Gustavo Sutter - 9763193
+Matheus Gomes - 9779270
+Guilherme Montemovo - 9779461
+Joice Aurino - 8530851
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <manipulacao_arquivos.h>
@@ -68,7 +78,7 @@ Companhia *buscarPorPosicao(char *nome_arquivo, int posicao, Metodo metodo){
 }
 
 
-/* Le todas os compnhias do arquivo usando o metodo passado*/
+/* Le todas os companhias do arquivo usando o metodo passado*/
 Companhia **lerTodasCompanhias(char* nome_arquivo, int *n_regs, Metodo metodo){
 	FILE *fp = NULL;
 	Companhia **companhias;

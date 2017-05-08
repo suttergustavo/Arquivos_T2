@@ -1,3 +1,12 @@
+/*
+Autores:
+
+Gustavo Sutter - 9763193
+Matheus Gomes - 9779270
+Guilherme Montemovo - 9779461
+Joice Aurino - 8530851
+
+*/
 #include <stdlib.h>
 #include <stdio.h>
 #include <companhias.h>
