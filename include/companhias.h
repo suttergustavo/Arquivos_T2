@@ -46,6 +46,8 @@ typedef enum{
 }Campo;
 
 
+/* Aloca uma nova estrutura companhia */
+Companhia *criarCompanhia(int);
 /* Retorna um determinado campo de uma companhia */
 char *getCampoCompanhia(Companhia *,Campo);
 /* Recebe um nome de arquivo CSV e retorna todos os registros contidos nele */
