@@ -7,7 +7,7 @@ int main(){
     int op, estrutura, n_regs, i, j, nr, n_campo, loop = 1;
     char *string_busca;
     char *string_campo;
-    char string_nome_arquivo[20];
+    char string_nome_arquivo[20],nome_arquivo_dados[20];
     Companhia **cs,*c;
 
     printf("\n Escolha uma estrutura: ");
@@ -16,6 +16,9 @@ int main(){
     printf("\n 3-Registro com numero fixo de campos");
     printf("\n\n >>Opcao:  ");
     scanf("%d", &estrutura);
+
+	printf("\n Digite o nome do arquivo de dados (Lembre-se de que ele deve possuir o metodo de armazenamento compativel): ");
+	scanf("%s%*c",nome_arquivo_dados);
 
     while(loop == 1){
     	printf("\n\n Escolha uma das opcoes abaixo: ");
@@ -38,7 +41,7 @@ int main(){
 					printf("\n Arquivo não encontrado\n");
 				}
         		for(i = 0; i < n_regs; i++)
-        			escreverCompanhia("out",cs[i],estrutura);
+        			escreverCompanhia(nome_arquivo_dados,cs[i],estrutura);
         		for(j = 0;j < n_regs; j++)
         	    	destruirCompanhia(cs[j]);
         	    if(cs) free(cs);
@@ -46,17 +49,18 @@ int main(){
             	break;
 
 			case 2: //LER TODAS AS COMPANHIAS DE UM ARQUIVO DE DADOS
-				cs = lerTodasCompanhias("out",&n_regs, estrutura);
-				if(!cs)
+				cs = lerTodasCompanhias(nome_arquivo_dados,&n_regs, estrutura);
+				if(!cs){
 					printf("\n Não encontrado\n");
-				
-				for(i=0; i<n_regs; ++i){
-					printf("\n\n");
-					imprimirCompanhia(cs[i]);
-					printf("------------\n");
-					destruirCompanhia(cs[i]);
+				}else{
+					for(i=0; i<n_regs; ++i){
+						printf("\n\n");
+						imprimirCompanhia(cs[i]);
+						printf("------------\n");
+						destruirCompanhia(cs[i]);
+					}
+					free(cs);	
 				}
-				free(cs);	
 			
 				break;
 
@@ -80,17 +84,20 @@ int main(){
 				printf("\n\n Digite a chave de busca: ");
 				scanf("%*c%m[^\n]", &string_busca);
 				
-				cs = buscarPorCampo("out",n_campo, string_busca,&n_regs,estrutura);
-				if(n_regs == 0)
-					printf("\n Não encontrado.\n");
-				
-				for(i=0; i<n_regs; ++i){
-					imprimirCompanhia(cs[i]);
-					printf("------------\n");
-					destruirCompanhia(cs[i]);
-				} 
+				cs = buscarPorCampo(nome_arquivo_dados,n_campo, string_busca,&n_regs,estrutura);
+				if(cs){
+					if(n_regs == 1) printf("\n Registro encontrado: \n\n");
+					else printf("\n Registros encontrados: \n");
+					for(i=0; i<n_regs; ++i){
+						imprimirCompanhia(cs[i]);
+						printf("------------\n");
+						destruirCompanhia(cs[i]);
+					} 
+					free(cs);
+				}else{
+					printf("\n Não encontrado\n");
+				}			
 				free(string_busca);
-				free(cs);
 
         	    break;
 
@@ -98,11 +105,14 @@ int main(){
 				printf("\n\n Numero do Registro: ");
 				scanf("%d", &nr);
 			
-				c = buscarPorPosicao("out",nr,estrutura);
-				if(c) imprimirCompanhia(c);
+				c = buscarPorPosicao(nome_arquivo_dados,nr,estrutura);
+				if(c){
+					printf("\n Registro encontrado: \n");
+					imprimirCompanhia(c);
+					destruirCompanhia(c);
+				}
 				else printf("\n Não encontrado\n");
 				
-				if(c) destruirCompanhia(c);
 						
 				break;
 
@@ -121,7 +131,7 @@ int main(){
 				scanf("%d", &n_campo);
 				printf("\n\n Numero do Registro: ");
 				scanf("%d", &nr);
-				c = buscarPorPosicao("out",nr,estrutura);
+				c = buscarPorPosicao(nome_arquivo_dados,nr,estrutura);
 				if(!c){
 					printf("\n Não encontrado\n");
 					break;

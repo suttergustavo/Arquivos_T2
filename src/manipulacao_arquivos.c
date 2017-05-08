@@ -31,15 +31,16 @@ Companhia **buscarPorCampo(char *nome_arquivo, Campo campo, char *query, int *n_
 
 	fp = fopen(nome_arquivo,"rb");
 
-	if(metodo == INDICADOR_TAMANHO){
-		companhias = buscarCampoTamReg(fp,campo,query,n_regs);
-	}else if(metodo == NUMERO_FIXO_CAMPOS){
-		companhias = buscarCampoNumFixo(fp,campo,query,n_regs);
-	}else if(metodo == DELIMITADOR_REGISTROS){
-		companhias = buscarCampoDelimitador(fp,campo,query,n_regs);
+	if(fp != NULL){
+		if(metodo == INDICADOR_TAMANHO){
+			companhias = buscarCampoTamReg(fp,campo,query,n_regs);
+		}else if(metodo == NUMERO_FIXO_CAMPOS){
+			companhias = buscarCampoNumFixo(fp,campo,query,n_regs);
+		}else if(metodo == DELIMITADOR_REGISTROS){
+			companhias = buscarCampoDelimitador(fp,campo,query,n_regs);
+		}
+		fclose(fp);
 	}
-
-	fclose(fp);
 
 	return companhias;
 }
@@ -52,15 +53,16 @@ Companhia *buscarPorPosicao(char *nome_arquivo, int posicao, Metodo metodo){
 
 	fp = fopen(nome_arquivo,"rb");
 
-	if(metodo == INDICADOR_TAMANHO){
-		companhia = buscarNumRegTamReg(fp,posicao);
-	}else if(metodo == NUMERO_FIXO_CAMPOS){
-		companhia = buscarNumRegNumFixo(fp,posicao);
-	}else if(metodo == DELIMITADOR_REGISTROS){
-		companhia = buscarNumRegDelimitador(fp,posicao);
+	if(fp != NULL){
+		if(metodo == INDICADOR_TAMANHO){
+			companhia = buscarNumRegTamReg(fp,posicao);
+		}else if(metodo == NUMERO_FIXO_CAMPOS){
+			companhia = buscarNumRegNumFixo(fp,posicao);
+		}else if(metodo == DELIMITADOR_REGISTROS){
+			companhia = buscarNumRegDelimitador(fp,posicao);
+		}
+		fclose(fp);
 	}
-
-	fclose(fp);
 
 	return companhia;
 }
@@ -68,20 +70,21 @@ Companhia *buscarPorPosicao(char *nome_arquivo, int posicao, Metodo metodo){
 
 /* Le todas os compnhias do arquivo usando o metodo passado*/
 Companhia **lerTodasCompanhias(char* nome_arquivo, int *n_regs, Metodo metodo){
-	FILE *fp;
+	FILE *fp = NULL;
 	Companhia **companhias;
 
 	fp = fopen(nome_arquivo,"rb");
 
-	if(metodo == INDICADOR_TAMANHO){
-		companhias = lerTodosTamReg(fp,n_regs);
-	}else if(metodo == NUMERO_FIXO_CAMPOS){
-		companhias = lerTodosNumFixo(fp,n_regs);
-	}else if(metodo == DELIMITADOR_REGISTROS){
-		companhias = lerTodosDelimitador(fp,n_regs);
+	if(fp != NULL){
+		if(metodo == INDICADOR_TAMANHO){
+			companhias = lerTodosTamReg(fp,n_regs);
+		}else if(metodo == NUMERO_FIXO_CAMPOS){
+			companhias = lerTodosNumFixo(fp,n_regs);
+		}else if(metodo == DELIMITADOR_REGISTROS){
+			companhias = lerTodosDelimitador(fp,n_regs);
+		}
+		fclose(fp);
 	}
-
-	fclose(fp);
 
 	return companhias;	
 }
