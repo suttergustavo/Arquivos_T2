@@ -21,28 +21,30 @@ typedef struct Companhia Companhia;
 #define DELIM_FIM_CAMPO '|'
 #define DELIM_FIM_REG '#'
 
+#define FLAG_REMOVIDO '*'
+
 //estrutura companhia, com os campos especificados
 struct Companhia{
 	char *cnpj;
-	char *nome_social;
-	char *nome_fantasia;
+	char *cnpj_auditoria;
 	char *data_registro;
 	char *data_cancelamento;
+	char *nome_social;
+	char *nome_fantasia;
 	char *motivo_cancelamento;
 	char *nome_empresa;
-	char *cnpj_auditoria;
 };
 
 //tipo que define os campos da estrutura companhia
 typedef enum{
 	CNPJ = 1,
-	NOME_SOCIAL,
-	NOME_FANTASIA,
+	CNPJ_AUDITORIA,
 	DATA_REGISTRO,
 	DATA_CANCELAMENTO,
+	NOME_SOCIAL,
+	NOME_FANTASIA,
 	MOTIVO_CANCELAMENTO,
-	NOME_EMPRESA,
-	CNPJ_AUDITORIA
+	NOME_EMPRESA
 }Campo;
 
 
@@ -59,4 +61,5 @@ void imprimirCompanhia(Companhia*);
 /* Checa se o uma compania tem um campo igual a uma query */
 int possuiCampoProcurado(Companhia *, Campo, char *);
 
+Companhia *lerCompanhiaCSV(FILE *);
 #endif

@@ -13,10 +13,10 @@ Joice Aurino - 8530851
 
 #include <companhias.h>
 
-void escreverCompanhiaDelimitador(FILE*,Companhia*);
+int escreverCompanhia(FILE*,Companhia*);
+void imprimirTodos(FILE *);
 Companhia *buscarNumRegDelimitador(FILE *,int);
-Companhia *lerCompanhiaDelimitador(FILE *);
+Companhia *lerCompanhia(FILE *);
 Companhia **buscarCampoDelimitador(FILE *, Campo, char *, int *);
-Companhia **lerTodosDelimitador(FILE *, int*);
 
 #endif
