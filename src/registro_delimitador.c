@@ -12,6 +12,7 @@ Joice Aurino - 8530851
 #include <stdlib.h>
 #include <string.h>
 #include <registro_delimitador.h>
+#include <indice.h>
 
 /* Escreve companhia no arquivo de dados e retorna o byte offset */
 int escreverCompanhia(FILE *out,Companhia *companhia) {
@@ -69,6 +70,33 @@ void imprimirTodos(FILE *in){
 			destruirCompanhia(companhia);
 		}
 	}
+}
+
+// Busca uma companhia a partir do indice
+Companhia *buscarIndice(FILE *in, FILE *indice, char *cnpj) {
+	Companhia *companhia;
+	RegIndice *reg;
+	int end, offset;
+
+	fseek(indice,0,SEEK_END);
+	end = (int) ftell(indice);
+	fseek(indice,0,SEEK_SET);
+
+	while(ftell(indice) < end){
+		reg = lerIndice(indice);
+		if(possuiIndiceProcurado(reg, cnpj)){
+			offset = reg->offset;
+
+			fseek(in,offset,SEEK_SET);
+			companhia = lerCompanhia(in);
+
+			return companhia;
+		}else{
+			destruirIndice(reg);
+		}
+	}
+
+	return NULL;
 }
 
 /* Busca por registros atráves de um campo passado pelo usuário, e o retorna todos encontrados */

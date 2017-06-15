@@ -6,8 +6,11 @@ typedef struct{
 	int offset;
 }RegIndice;
 
+void criarIndice(FILE *, FILE *);
 void escreverIndice(FILE *,char *,int);
-int buscarIndice(FILE *,char*);
+int possuiIndiceProcurado(RegIndice *, char *);
+void imprimirIndice(FILE *);
+void destruirIndice(RegIndice *);
 RegIndice *lerIndice(FILE*);
 
 #endif
