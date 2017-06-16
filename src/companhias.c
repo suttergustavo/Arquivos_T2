@@ -186,3 +186,36 @@ Companhia **lerCSVCompleto(char *filename, int *n_companhias){
 	*n_companhias = count;
 	return companhias;
 }
+
+/* Retorna o tamanho da companhia em bytes(leva em consideração os delimitadores que serão inseridos)*/
+int getTamanhoCompanhia(Companhia *companhia){
+	int tamanho = 0;
+	
+	if(companhia->cnpj) tamanho += strlen(companhia->cnpj)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->cnpj_auditoria) tamanho += strlen(companhia->cnpj_auditoria)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->data_registro) tamanho += strlen(companhia->data_registro)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->data_cancelamento) tamanho += strlen(companhia->data_cancelamento)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->nome_social) tamanho += strlen(companhia->nome_social)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->nome_fantasia) tamanho += strlen(companhia->nome_fantasia)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->motivo_cancelamento) tamanho += strlen(companhia->motivo_cancelamento)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	if(companhia->nome_empresa) tamanho += strlen(companhia->nome_empresa)+1; //tamanho da string + '\0'
+	tamanho++; //delimitador fim de campo
+
+	tamanho++; //delimitador fim de registro
+
+	return tamanho;
+}

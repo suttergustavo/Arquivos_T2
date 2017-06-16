@@ -14,24 +14,38 @@ Joice Aurino - 8530851
 #include <registro_delimitador.h>
 
 /* Escreve companhia no arquivo de dados e retorna o byte offset */
-int escreverCompanhia(FILE *out,Companhia *companhia) {
+int escreverCompanhia(char *filename,Companhia *companhia) {
 	char delim_fim_campo = DELIM_FIM_CAMPO;
 	char delim_fim_reg = DELIM_FIM_REG;
-	int tam_atual,prox_offset;
+
+	FILE *out = NULL;
+	out = fopen(filename,"r+");
+	if(out == NULL){
+		printf("entrei!!!!!!!!\n");
+		out = fopen(filename,"w+");
+	}
 
 	//verificando se o arquivo possui cabeçalho(ou seja, se n acabou de ser criado)
 	fseek(out,0,SEEK_END);
 	if(ftell(out) == 0){//caso não tenha nada no arquivo
+		printf("esta!!\n");
 		int cabeca_lista = -1;
 		fwrite(&cabeca_lista,sizeof(int),1,out); //escreve a cabeça da lista no cabeçalho
 	}
 
+	printf("começando a busca\n");
+
+	int tamanho_procurado = getTamanhoCompanhia(companhia); //é preciso saber o tamanho doregistro para encontrar a posição adequada
+	printf("tamanho do registro = %d\n",tamanho_procurado);
+
 	//procura estaço para reutilização do espaco
-	int curr_offset,prox_offset;
+	int curr_offset,prox_offset,tam_atual;
 	int ant_offset = 0;
-	fread(&cutr_offset,sizeof(int),1,out);
+	fseek(out,0,SEEK_SET);
+	fread(&curr_offset,sizeof(int),1,out);
 	fseek(out,0,SEEK_SET);
 	while(curr_offset != -1){
+		printf("curr_offset = %d\n",curr_offset);
 		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
 		fread(&tam_atual,sizeof(int),1,out);
 		if(tam_atual >= tamanho_procurado){
@@ -46,9 +60,16 @@ int escreverCompanhia(FILE *out,Companhia *companhia) {
 		fread(&curr_offset,sizeof(int),1,out);
 	}
 	//posiciona o ponteiro onde o registro deve ser inserido
-	if(curr_offset != -1) fseek(out,0,SEEK_SET);
-	else fseek(out,0,SEEK_END);
+	printf("curr offset = %d\n",curr_offset);
+	if(curr_offset != -1){
+		fseek(out,curr_offset,SEEK_SET);
+	}
+	else{
+		fseek(out,0,SEEK_END);
+		printf("curr offset = -1 vou esvre em %d\n",(int)ftell(out));
+	} 
 
+	printf("VOU ESCREVER EM: %d\n",(int)ftell(out));
 
 	int offset = (int) ftell(out);
 
@@ -87,21 +108,28 @@ int escreverCompanhia(FILE *out,Companhia *companhia) {
 void removerRegistro(FILE *out, int offset){
 	char rem = '*';
 
-
 	fseek(out,offset,SEEK_SET);
 
-	//pega o tamanho do resgitro que vi ser removido
+	//pega o tamanho do registro que vi ser removido
 	char c;
 	int count = 0;
 	while(c != DELIM_FIM_REG){
 		c = fgetc(out);
-		printf("c = %c (%d)\n",c,count);
 		count++;
 	}
-	printf("tamanho = %d\n",count);
 
-	int next_elem = -1; //o proximo elemento na lista ligada
 
+	//a cabeça da lista vai passar a ser o proximo elemento
+	int next_elem; //o proximo elemento na lista ligada
+	fseek(out,0,SEEK_SET); //posicao do regitro de cabeçalho
+	fwrite(&next_elem,sizeof(int),1,out);
+	
+	//a nova cabeça da lista é o elemento sendo removido agora
+	fseek(out,0,SEEK_SET);
+	fwrite(&offset,sizeof(int),1,out);
+
+
+	//o registro é removido logicamente, escrevendo '*',tamanho do registro e prox na lista de removidos
 	fseek(out,offset,SEEK_SET);
 	fwrite(&rem,sizeof(char),1,out); //escreve *
 	fwrite(&count,sizeof(int),1,out); //escreve o tamanho do registro

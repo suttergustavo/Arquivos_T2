@@ -13,7 +13,7 @@ Joice Aurino - 8530851
 
 #include <companhias.h>
 
-int escreverCompanhia(FILE*,Companhia*);
+int escreverCompanhia(char*,Companhia*);
 void imprimirTodos(FILE *);
 Companhia *buscarNumRegDelimitador(FILE *,int);
 Companhia *lerCompanhia(FILE *);

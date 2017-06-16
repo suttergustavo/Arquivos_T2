@@ -60,6 +60,8 @@ void destruirCompanhia(Companhia*);
 void imprimirCompanhia(Companhia*);
 /* Checa se o uma compania tem um campo igual a uma query */
 int possuiCampoProcurado(Companhia *, Campo, char *);
+/* Retorna o tamanho da companhia em bytes(leva em consideração os delimitadores que serão inseridos)*/
+int getTamanhoCompanhia(Companhia *);
 
 Companhia *lerCompanhiaCSV(FILE *);
 #endif

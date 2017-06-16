@@ -7,9 +7,9 @@
 
 void csv2dados(){
 	FILE *in = fopen("in","r");
-	FILE *out = fopen("out","w");
 	FILE *indice = fopen("indice.dat","a");
 	Companhia *c;
+	char out[4] = "out";
 
 	fseek(in,0,SEEK_END);
 	int size = (int) ftell(in);	
@@ -18,7 +18,6 @@ void csv2dados(){
 	while(size > (int) ftell(in)){
 		c = lerCompanhiaCSV(in);
 		imprimirCompanhia(c);
-		fseek(out,0,SEEK_END);
 		int o = escreverCompanhia(out,c);
 		escreverIndice(indice,c->cnpj,o);
 		printf("offset = %d\n",o);
