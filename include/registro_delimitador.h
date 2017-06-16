@@ -18,5 +18,6 @@ void imprimirTodos(FILE *);
 Companhia *buscarNumRegDelimitador(FILE *,int);
 Companhia *lerCompanhia(FILE *);
 Companhia **buscarCampoDelimitador(FILE *, Campo, char *, int *);
+void removerRegistro(FILE*,int);
 
 #endif

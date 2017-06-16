@@ -48,12 +48,7 @@ void indice2tela(){
 
 void removerCompanhia(){
 	FILE *in = fopen("out","r+");
-	char rem = '*';
-	char str[10] = "FOI!!!!";
-
-	fseek(in,175,SEEK_SET);
-	fwrite(&rem,sizeof(char),1,in);
-	fwrite(&str,sizeof(char),strlen(str)+1,in);
+	removerRegistro(in,179);
 }
 
 
