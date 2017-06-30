@@ -36,7 +36,7 @@ void indice2tela(){
 	
 	fseek(in,0,SEEK_END);
 	int size = (int) ftell(in);	
-	fseek(in,0,SEEK_SET);
+	fseek(in,4,SEEK_SET);
 	
 	while(size > (int) ftell(in)){
 		r = lerIndice(in);

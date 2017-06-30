@@ -20,7 +20,7 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 
 	FILE *out = NULL;
 	out = fopen(filename,"r+");
-	if(out == NULL)	out = fopen(filename,"w+");
+	if(out == NULL)	out = fopen(filename,"w+"); //caso o arquivo não exista ele é criado 
 
 	//verificando se o arquivo possui cabeçalho(ou seja, se n acabou de ser criado)
 	fseek(out,0,SEEK_END);
@@ -38,10 +38,8 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 	fread(&curr_offset,sizeof(int),1,out);
 	fseek(out,0,SEEK_SET);
 	while(curr_offset != -1){
-		printf("curr offset %d\n",curr_offset);
 		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
 		fread(&tam_atual,sizeof(int),1,out);
-		printf("atual: %d nesse: %d\n",tam_atual,tamanho_procurado);
 		if(tam_atual >= tamanho_procurado){
 			//religa a lista
 			fread(&prox_offset,sizeof(int),1,out);
@@ -59,20 +57,24 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 
 
 	int offset = (int) ftell(out);
+	char cnpj_nulo[TAMANHO_CNPJ + 1] = CNPJ_NULO;
+	char data_nula[TAMANHO_DATA + 1] = DATA_NULA;
 
-	//escree cada campo e um delimitador entre eles
+	//escreve os campos de tamanho fixo tratando o nulo
+
 	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
-	
+	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
+		
 	if(companhia->cnpj_auditoria) fwrite(companhia->cnpj_auditoria,sizeof(char),strlen(companhia->cnpj_auditoria)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
 	
 	if(companhia->data_registro) fwrite(companhia->data_registro,sizeof(char),strlen(companhia->data_registro)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
 	
 	if(companhia->data_cancelamento) fwrite(companhia->data_cancelamento,sizeof(char),strlen(companhia->data_cancelamento)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
 
+	//escreve cada campo variavel e um delimitador entre eles
 	if(companhia->nome_social) fwrite(companhia->nome_social,sizeof(char),strlen(companhia->nome_social)+1,out);
 	fwrite(&delim_fim_campo,sizeof(char),1,out);
 	
@@ -99,14 +101,13 @@ void removerRegistro(FILE *out, int offset){
 
 	fseek(out,offset,SEEK_SET);
 
-	//pega o tamanho do registro que vi ser removido
+	//pega o tamanho do registro que vai ser removido
 	char c;
 	int count = 0;
 	while(c != DELIM_FIM_REG){
 		c = fgetc(out);
 		count++;
 	}
-
 
 	//a cabeça da lista vai passar a ser o proximo elemento
 	int next_elem; //o proximo elemento na lista ligada
@@ -116,7 +117,6 @@ void removerRegistro(FILE *out, int offset){
 	//a nova cabeça da lista é o elemento sendo removido agora
 	fseek(out,0,SEEK_SET);
 	fwrite(&offset,sizeof(int),1,out);
-
 
 	//o registro é removido logicamente, escrevendo '*',tamanho do registro e prox na lista de removidos
 	fseek(out,offset,SEEK_SET);
@@ -132,7 +132,7 @@ void imprimirTodos(FILE *in){
 
 	fseek(in,0,SEEK_END);
 	end = (int) ftell(in);
-	fseek(in,0,SEEK_SET);
+	fseek(in,4,SEEK_SET); //pula o registro de cabeçalho
  
 	while(ftell(in) < end){//enquanto não chegar no fim do arquivo
 		companhia = lerCompanhia(in);
@@ -186,18 +186,38 @@ Companhia *lerCompanhia(FILE *in){
 	int campo = 1;
 	int count = 0;
 	int run = 1;
+	char *buffer;
+
+
+	for(int i=0;i<2;i++){ //le os dois campos cnpj
+		buffer = (char*) malloc(sizeof(char) * (TAMANHO_CNPJ));
+		fread(buffer,sizeof(char),TAMANHO_CNPJ,in);
+		if(!strcmp(buffer,CNPJ_NULO)){ //caso o campo seja nulo
+			free(buffer);
+			buffer = NULL;
+		}	
+		salvarCampoCompanhia(companhia,campo++,buffer);
+	}
+
+	for(int i=0;i<2;i++){ //le os dois campos de data
+		buffer = (char*) malloc(sizeof(char) * (TAMANHO_DATA));
+		fread(buffer,sizeof(char),TAMANHO_DATA,in);
+		if(!strcmp(buffer,DATA_NULA)){ //caso o campo seja nulo
+			free(buffer);
+			buffer = NULL;
+		}	
+		salvarCampoCompanhia(companhia,campo++,buffer);
+	}
 
 	while(run){
 		fread(&c,sizeof(char),1,in);
 		if(c == FLAG_REMOVIDO){
 			companhia = NULL;
 			run = 0;
-			do{
+			do{ //ignora o resto dos caracteres até chegar no fim do regitro
 				fread(&c,sizeof(char),1,in);
-				// printf("%c ",c);
 			}while(c != DELIM_FIM_REG);
 		}else if(c == DELIM_FIM_CAMPO){
-			// printf(">> %s\n",valor_campo);
 			salvarCampoCompanhia(companhia,campo,valor_campo);
 			campo++;
 			valor_campo = NULL;

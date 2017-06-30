@@ -15,11 +15,14 @@ typedef struct Companhia Companhia;
 
 //TAMANHO DOS CAMPO DE TAMANHO FIXO
 #define TAMANHO_CNPJ 19
-#define TAMANHO_DATA 11
+#define TAMANHO_DATA 9
 
 //delimitadores de fim de campo e de arquivo
 #define DELIM_FIM_CAMPO '|'
 #define DELIM_FIM_REG '#'
+
+#define CNPJ_NULO "XX.XXX.XXX/XXXX-XX"
+#define DATA_NULA "XX/XX/XX"
 
 #define FLAG_REMOVIDO '*'
 

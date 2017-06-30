@@ -19,10 +19,10 @@ Companhia *criarCompanhia(int flag_alocar){
 
 	//aloca memoria para os campos de tamanho fixo
 	if(flag_alocar == 1){
-		nova_companhia->cnpj = (char *) malloc(TAMANHO_CNPJ * sizeof(char));
-		nova_companhia->cnpj_auditoria = (char *) malloc(TAMANHO_CNPJ * sizeof(char));
-		nova_companhia->data_registro = (char *) malloc(TAMANHO_DATA * sizeof(char));
-		nova_companhia->data_cancelamento = (char *) malloc(TAMANHO_DATA * sizeof(char));
+		nova_companhia->cnpj = (char *) malloc((TAMANHO_CNPJ + 1) * sizeof(char));
+		nova_companhia->cnpj_auditoria = (char *) malloc((TAMANHO_CNPJ + 1) * sizeof(char));
+		nova_companhia->data_registro = (char *) malloc((TAMANHO_DATA + 1) * sizeof(char));
+		nova_companhia->data_cancelamento = (char *) malloc((TAMANHO_DATA + 1) * sizeof(char));
 	}
 
 	return nova_companhia;
@@ -48,7 +48,7 @@ void imprimirCompanhia(Companhia *companhia){
 	if(companhia->nome_social) printf("NOME SOCIAL: %s\n",companhia->nome_social);
 	if(companhia->nome_fantasia) printf("NOME FANTASIA: %s\n",companhia->nome_fantasia);
 	if(companhia->data_registro) printf("DATA REGISTRO: %s\n",companhia->data_registro);
-	// if(companhia->data_cancelamento) printf("DATA CANCELAMENTO: %s\n",companhia->data_cancelamento);
+	if(companhia->data_cancelamento) printf("DATA CANCELAMENTO: %s\n",companhia->data_cancelamento);
 	if(companhia->motivo_cancelamento) printf("MOTIVO CANCELAMENTO: %s\n",companhia->motivo_cancelamento);
 	if(companhia->nome_empresa) printf("NOME EMPRESA: %s\n",companhia->nome_empresa);
 	if(companhia->cnpj_auditoria) printf("CNPJ AUDITORIA: %s\n",companhia->cnpj_auditoria);
