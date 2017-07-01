@@ -20,11 +20,11 @@ void salvarIndice(FILE *, Indice *);
 Indice *carregarIndice(FILE *);
 int buscarIndice(Indice *, char *);
 void validadeIndice(FILE *, Validade);
-void escreverIndice(FILE *,char *,int);
 void inserirIndice(Indice *,char *,int );
 int removerIndice(Indice *, char *);
 void imprimirIndice(FILE *);
 void destruirIndice(RegIndice *);
 void destruirIndiceCompleto(Indice *);
+Indice *criarIndice();
 
 #endif

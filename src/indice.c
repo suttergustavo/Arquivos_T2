@@ -5,17 +5,26 @@
 #include <registro_delimitador.h>
 #include <indice.h>
 
+// Escreve no disco o indice 
+void escreverIndice(FILE *indice,RegIndice *registro_indice) {
+	fwrite(registro_indice->cnpj,sizeof(char),TAMANHO_CNPJ + 1,indice);
+	fwrite(&(registro_indice->offset),sizeof(int),1,indice);
+}
+
 // Cria arquivo de indices a partir de um vetor na memoria
 void salvarIndice(FILE *out, Indice *in) {
 	int validade = VALIDO;
 
+	//escreve os registros de indice no arquivo de indice
+	fseek(out, 4, SEEK_SET);
+	for (int i = 0; i < in->size; i++)
+		escreverIndice(out, in->indice[i]);
+		
+	//quando acaba de escrever avisa que o conteudo do arquvo é valido
 	fseek(out, 0, SEEK_SET);
 	fwrite(&validade, sizeof(int), 1, out);
-		
-	for (int i = 0; i < in->size; i++){
-		escreverIndice(out, in->indice[i]->cnpj, in->indice[i]->offset);
-	}
 }
+
 
 // Leitura do indice individual do disco para memoria principal
 RegIndice *lerIndice(FILE *indice){
@@ -42,8 +51,8 @@ Indice *carregarIndice(FILE *in) {
 	int size = (int) ftell(in);	
 	fseek(in, 4, SEEK_SET);
 
-	out = (Indice *)malloc(sizeof(Indice));
-	
+	out = (Indice *) malloc(sizeof(Indice));
+	 
 	while(size > (int) ftell(in)){
 		indice = (RegIndice **)realloc(indice, sizeof(RegIndice *) * (count+1));
 		indice[count++] = lerIndice(in);
@@ -55,15 +64,25 @@ Indice *carregarIndice(FILE *in) {
 }
 
 int buscarIndice(Indice *in, char *cnpj) {
-	int pos = in->size/2, start = 0, end = in->size - 1;
+	// int pos = in->size/2, start = 0, end = in->size - 1;
 
-	while (start < end) {
-		if (!strcmp(cnpj, in->indice[pos]->cnpj)) return pos;
-		else if (strcmp(cnpj, in->indice[pos]->cnpj) < 0) end = pos-1;
-		else start = pos+1;
+	// while (start < end) {
+	// 	if (!strcmp(cnpj, in->indice[pos]->cnpj)) return pos;
+	// 	else if (strcmp(cnpj, in->indice[pos]->cnpj) < 0) end = pos-1;
+	// 	else start = pos+1;
+	// }
+
+	// return -1; // nao encontrado
+
+	int pos = -1;
+	for(int i=0;i<in->size;i++){
+		if(!strcmp(in->indice[i]->cnpj,cnpj)){
+			pos = i;
+			break;
+		}
 	}
 
-	return -1; // nao encontrado
+	return pos;
 }
 
 // Coloca o indice como valido ou invalido. Deve ser utilizado quando ocorrer uma inserçao, remoçao, atualização, ou quando o programa encerrar
@@ -72,11 +91,6 @@ void validadeIndice(FILE *indice, Validade validade) {
 	fwrite(&validade, sizeof(int), 1, indice);
 }
 
-// Escreve no disco o indice 
-void escreverIndice(FILE *indice,char *cnpj,int offset) {
-	fwrite(cnpj,sizeof(char),TAMANHO_CNPJ + 1,indice);
-	fwrite(&offset,sizeof(int),1,indice);
-}
 
 // Insere no arquivo de indices da memoria
 void inserirIndice(Indice *in ,char *cnpj,int offset) {
@@ -84,28 +98,23 @@ void inserirIndice(Indice *in ,char *cnpj,int offset) {
 	reg->cnpj = cnpj;
 	reg->offset = offset;
 
-	in->indice = (RegIndice **)realloc(in, sizeof(RegIndice *) * (in->size));
-	in->indice[in->size-1] = reg;
-
-	in->size++;
+	in->indice = (RegIndice **) realloc(in->indice, sizeof(RegIndice *) * (in->size + 1));
+	in->indice[in->size++] = reg;
 }
 
 // Remove um indice
 int removerIndice(Indice *in, char *cnpj) {
-	int pos = buscarIndice(in, cnpj);
+	int pos = buscarIndice(in, cnpj); //procura pelo indice do registro que será removido
 
-	if (pos == -1) return -1; // nao encontrado
+	if(pos == -1) return 0; //nao encontrado portanto não pode ser removido
 
-	destruirIndice(in->indice[pos]);
+	destruirRegIndice(in->indice[pos]); //tira o indice da memoria
 
-	while (pos != in->size-1) {
-		in->indice[pos] = in->indice[pos+1];
-		pos++;
-	}
+	while (pos != in->size-1) in->indice[pos] = in->indice[++pos]; //shifta o resto do vetor
 
-	in->size--;
+	in->size--; //reduz o tamanho do vetor de indices
 
-	return 1;
+	return 1; //removido com sucesso
 }
 
 void imprimirIndice(FILE *indice) {
@@ -118,20 +127,23 @@ void imprimirIndice(FILE *indice) {
 	while(size > (int) ftell(indice)){
 		r = lerIndice(indice);
 		printf("%s | %d\n",r->cnpj,r->offset);
-		destruirIndice(r);
+		destruirRegIndice(r);
 	}
 }
 
-void destruirIndice(RegIndice *reg){
+void destruirRegIndice(RegIndice *reg){
 	if(reg->cnpj) free(reg->cnpj);
-
 	free(reg);
 }
 
-void destruirIndiceCompleto(Indice *in) {
+void destruirIndice(Indice *in) {
 	for (int i = 0; i < in->size; i++)
-		destruirIndice(in->indice[i]);
+		destruirRegIndice(in->indice[i]);
 
 	free(in->indice);
 	free(in);
+}
+
+Indice *criarIndice(){
+	return (Indice *) calloc(1,sizeof(Indice));
 }

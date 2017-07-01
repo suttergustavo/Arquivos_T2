@@ -59,10 +59,10 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 	if(curr_offset != -1) fseek(out,curr_offset,SEEK_SET);
 	else fseek(out,0,SEEK_END);
 
-
 	int offset = (int) ftell(out);
 	char cnpj_nulo[TAMANHO_CNPJ] = CNPJ_NULO;
 	char data_nula[TAMANHO_DATA] = DATA_NULA;
+
 
 	//escreve os campos de tamanho fixo tratando o nulo
 
@@ -191,6 +191,8 @@ void removerRegistro(FILE *out, int offset){
 		c = fgetc(out);
 		tamanho++;
 	}
+
+	firstFit(out,offset,tamanho);
 
 }
 
