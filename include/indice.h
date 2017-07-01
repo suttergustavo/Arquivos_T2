@@ -6,8 +6,25 @@ typedef struct{
 	int offset;
 }RegIndice;
 
+typedef struct{
+	RegIndice **indice;
+	int size;
+}Indice;
+
+typedef enum {
+	INVALIDO,
+	VALIDO
+}Validade;
+
+void salvarIndice(FILE *, Indice *);
+Indice *carregarIndice(FILE *);
+int buscarIndice(Indice *, char *);
+void validadeIndice(FILE *, Validade);
 void escreverIndice(FILE *,char *,int);
-int buscarIndice(FILE *,char*);
-RegIndice *lerIndice(FILE*);
+void inserirIndice(Indice *,char *,int );
+int removerIndice(Indice *, char *);
+void imprimirIndice(FILE *);
+void destruirIndice(RegIndice *);
+void destruirIndiceCompleto(Indice *);
 
 #endif

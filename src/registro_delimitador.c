@@ -12,6 +12,7 @@ Joice Aurino - 8530851
 #include <stdlib.h>
 #include <string.h>
 #include <registro_delimitador.h>
+#include <indice.h>
 
 /* Escreve companhia no arquivo de dados e retorna o byte offset */
 int escreverCompanhia(char *filename,Companhia *companhia) {

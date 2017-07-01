@@ -8,6 +8,8 @@
 void csv2dados(){
 	FILE *in = fopen("in","r");
 	FILE *indice = fopen("indice.dat","a");
+	FILE *out = fopen("out","ab+");
+	//FILE *indice = fopen("indice.dat","w");
 	Companhia *c;
 	char out[4] = "out";
 
@@ -18,11 +20,11 @@ void csv2dados(){
 	while(size > (int) ftell(in)){
 		c = lerCompanhiaCSV(in);
 		imprimirCompanhia(c);
-		int o = escreverCompanhia(out,c);
+		int o = escreverCompanhia("out",c);
 		escreverIndice(indice,c->cnpj,o);
 		printf("offset = %d\n",o);
 		printf("-----------\n");
-	}	
+	}
 }
 
 void dados2tela(){
@@ -32,16 +34,7 @@ void dados2tela(){
 
 void indice2tela(){
 	FILE *in = fopen("indice.dat","r");
-	RegIndice *r;
-	
-	fseek(in,0,SEEK_END);
-	int size = (int) ftell(in);	
-	fseek(in,4,SEEK_SET);
-	
-	while(size > (int) ftell(in)){
-		r = lerIndice(in);
-		printf("%s %d\n",r->cnpj,r->offset);
-	}
+	imprimirIndice(in);
 
 }
 
@@ -51,6 +44,22 @@ void removerCompanhia(){
 	removerRegistro(in,175);
 }
 
+void testeBuscaIndice() {
+	/*char *cnpj;
+	Companhia *c;
+
+	FILE *in = fopen("out","r+");
+	FILE *indice = fopen("indice.dat","r");
+
+	printf ("Digite uma busca por CNPJ\n");
+	scanf ("%ms", &cnpj);
+
+	/////////
+
+	if (c) imprimirCompanhia(c);
+	else printf ("NÃO ENCONTRADO");
+	*/
+}
 
 int main(int argc, char *argv[]){
 	int op;
@@ -58,4 +67,7 @@ int main(int argc, char *argv[]){
 	if(op == 1) csv2dados();
 	if(op == 2) removerCompanhia();
 	if(op == 3) dados2tela();
+	if(op == 4) indice2tela();
+	if(op == 5) testeBuscaIndice();
+
 }	
