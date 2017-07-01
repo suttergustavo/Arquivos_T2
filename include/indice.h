@@ -16,8 +16,8 @@ typedef enum {
 	VALIDO
 }Validade;
 
-void salvarIndice(FILE *, Indice *);
-Indice *carregarIndice(FILE *);
+void salvarIndice(char *, Indice *);
+Indice *carregarIndice(char *);
 int buscarIndice(Indice *, char *);
 void validadeIndice(FILE *, Validade);
 void inserirIndice(Indice *,char *,int );

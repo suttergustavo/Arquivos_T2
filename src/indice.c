@@ -12,17 +12,18 @@ void escreverIndice(FILE *indice,RegIndice *registro_indice) {
 }
 
 // Cria arquivo de indices a partir de um vetor na memoria
-void salvarIndice(FILE *out, Indice *in) {
-	int validade = VALIDO;
-
-	//escreve os registros de indice no arquivo de indice
-	fseek(out, 4, SEEK_SET);
+void salvarIndice(char *filename, Indice *in) {
+	FILE *fp = fopen(filename,"w+");
+	int validade = INVALIDO;
+	
+	fwrite(&validade, sizeof(int), 1, fp); //antes de tranferir tudo o indice ainda é invalido
 	for (int i = 0; i < in->size; i++)
-		escreverIndice(out, in->indice[i]);
+		escreverIndice(fp, in->indice[i]);
 		
 	//quando acaba de escrever avisa que o conteudo do arquvo é valido
-	fseek(out, 0, SEEK_SET);
-	fwrite(&validade, sizeof(int), 1, out);
+	validade = VALIDO;
+	fseek(fp, 0, SEEK_SET);
+	fwrite(&validade, sizeof(int), 1, fp);
 }
 
 
@@ -38,29 +39,36 @@ RegIndice *lerIndice(FILE *indice){
 }
 
 // Cria arquivo de indices completo na memoria a partir do indice no disco
-Indice *carregarIndice(FILE *in) {
-	Indice *out;
-	RegIndice **indice = NULL;
+Indice *carregarIndice(char *filename) {
+	Indice *indice = criarIndice();
 	int count = 0, validade;
 
-	fseek(in, 0, SEEK_SET);
-	fread(&validade, sizeof(int), 1, in);
-	if (validade == INVALIDO) return NULL;	// se o indice estiver desatualizado
+	FILE *fp = fopen(filename,"r");
 
-	fseek(in, 0, SEEK_END);
-	int size = (int) ftell(in);	
-	fseek(in, 4, SEEK_SET);
-
-	out = (Indice *) malloc(sizeof(Indice));
-	 
-	while(size > (int) ftell(in)){
-		indice = (RegIndice **)realloc(indice, sizeof(RegIndice *) * (count+1));
-		indice[count++] = lerIndice(in);
+	if(fp == NULL){	//se não existe arquivo é porque o projeto é novo
+		printf("Arquivo inexistente, será criado\n");
+		fopen(filename,"w+"); //ja cria o arquivo para posteriomente ser usado(quando o indice for alterado será alterado o buty de validade)
+		return indice;	
 	}
-	out->indice = indice;
-	out->size = count;
 
-	return out;
+	fseek(fp, 0, SEEK_SET);
+	fread(&validade, sizeof(int), 1, fp);
+	if(validade == INVALIDO){ //se o byte de validade indicar que o arquivo está corrompido
+		printf("Arquivo de indice corrompido. Iniciando recuperação...\n");
+		return indice;
+	}
+
+	fseek(fp, 0, SEEK_END);
+	int size = (int) ftell(fp);	
+
+	fseek(fp, 4, SEEK_SET);
+	while(size > (int) ftell(fp)){
+		indice->indice = (RegIndice **) realloc(indice->indice, sizeof(RegIndice *) * (count+1));
+		indice->indice[count++] = lerIndice(fp);
+	}
+	indice->size = count;
+
+	return indice;
 }
 
 int buscarIndice(Indice *in, char *cnpj) {

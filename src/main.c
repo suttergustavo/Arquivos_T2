@@ -40,23 +40,6 @@ void removerCompanhia(Indice *idx){
 	removerIndice(idx,"01.851.771/0001-55");
 }
 
-// void testeBuscaIndice() {
-// 	char *cnpj;
-// 	Companhia *c;
-
-// 	FILE *in = fopen("out","r+");
-// 	FILE *indice = fopen("indice.dat","r");
-
-// 	printf ("Digite uma busca por CNPJ\n");
-// 	scanf ("%ms", &cnpj);
-
-// 	/////////
-
-// 	if (c) imprimirCompanhia(c);
-// 	else printf ("NÃO ENCONTRADO");
-	
-// }
-
 void printIndice(Indice *idx){
 	for(int i=0;i<idx->size;i++){
 		printf("%s %d\n",idx->indice[i]->cnpj,idx->indice[i]->offset);
@@ -65,13 +48,14 @@ void printIndice(Indice *idx){
 
 int main(int argc, char *argv[]){
 	int op;
-	Indice *indice = criarIndice();
+	char *idx_file;
+	scanf("%ms",&idx_file);
+	Indice *indice = carregarIndice(idx_file);
 	while(scanf("%d",&op) && op){
 		if(op == 1) csv2dados(indice);
 		if(op == 2) removerCompanhia(indice);
 		if(op == 3) dados2tela(indice);
-		if(op == 4) indice2tela();
-		// if(op == 5) testeBuscaIndice();
+		if(op == 4) salvarIndice(idx_file,indice);
 		if(op == 6) printIndice(indice);
 	}
 }	
