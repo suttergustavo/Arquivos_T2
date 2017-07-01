@@ -150,7 +150,7 @@ void worstFit(FILE *fp,int offset,int tamanho){
 	}
 }
 
-void bestFit(FILE *fp,int offset,int tamannho){
+void bestFit(FILE *fp,int offset,int tamanho){
 	char rem = '*';
 	int end_offset_prox = 0;//porque a primeiro valor está no cabeçalho do arquivo
 	int offset_prox;
@@ -163,7 +163,7 @@ void bestFit(FILE *fp,int offset,int tamannho){
 			fseek(fp,offset_prox+sizeof(char),SEEK_SET);//+sizeof(char) pra pular o byte de romovido('*')
 			fread(&tam_prox,sizeof(int),1,fp);
 
-			if(tam_prox < tamannho){//se o tamanho do elemento for menor continua andando na lista
+			if(tam_prox < tamanho){//se o tamanho do elemento for menor continua andando na lista
 				end_offset_prox = ftell(fp);	
 				continue; 
 			}
@@ -173,69 +173,44 @@ void bestFit(FILE *fp,int offset,int tamannho){
 
 		fseek(fp,offset,SEEK_SET);
 		fwrite(&rem,sizeof(char),1,fp); //escreve *
-		fwrite(&tamannho,sizeof(int),1,fp); //escreve o tamanho do registro
+		fwrite(&tamanho,sizeof(int),1,fp); //escreve o tamanho do registro
 		fwrite(&offset_prox,sizeof(int),1,fp); //proximo do novo passa a ser o proximo do anterior
 
 		break;
 	}
 }
 
-void removerRegistro(FILE *out, int offset){
+void removerRegistro(char *filename, int offset){
+	FILE *fp = fopen(filename,"r+");
 
-	fseek(out,offset,SEEK_SET);
+	fseek(fp,offset,SEEK_SET);
 
 	//pega o tamanho do registro que vai ser removido
 	char c = 0;
 	int tamanho = 0;
 	while(c != DELIM_FIM_REG){
-		c = fgetc(out);
+		c = fgetc(fp);
 		tamanho++;
 	}
 
-	firstFit(out,offset,tamanho);
+	firstFit(fp,offset,tamanho);
 
+	fclose(fp);
 }
 
 /* Imprime todos os registros de um arquivo */
-void imprimirTodos(FILE *in){
+void imprimirTodos(char *filename, Indice* indice){
 	Companhia *companhia;
-	int end;
 
-	fseek(in,0,SEEK_END);
-	end = (int) ftell(in);
-	fseek(in,4,SEEK_SET); //pula o registro de cabeçalho
- 
-	while(ftell(in) < end){//enquanto não chegar no fim do arquivo
-		companhia = lerCompanhia(in);
-		if(companhia) {
-			imprimirCompanhia(companhia);
-			printf("----------------\n");
-			destruirCompanhia(companhia);
-		}
+	if(filename == NULL || indice == NULL) return;
+
+	for(int i=0;i<indice->size;i++){
+		companhia = lerCompanhia(filename,indice->indice[i]->offset);
+		if(!companhia) continue;
+		imprimirCompanhia(companhia);
+		destruirCompanhia(companhia);
+		printf("----------------\n");
 	}
-}
-
-/* Busca por registros atráves de um campo passado pelo usuário, e o retorna todos encontrados */
-Companhia **buscarCampoDelimitador(FILE *in, Campo campo, char *query, int *n_regs){
-	Companhia *companhia,**companhias = NULL;
-	int end,count = 0;
-
-	fseek(in,0,SEEK_END);
-	end = (int) ftell(in);
-	fseek(in,0,SEEK_SET);
-
-	while(ftell(in) < end){
-		companhia = lerCompanhia(in);
-		if(possuiCampoProcurado(companhia,campo,query)){
-			companhias = (Companhia**) realloc(companhias,sizeof(Companhia*)*(count+1));
-			companhias[count++] = companhia;
-		}else{
-			destruirCompanhia(companhia);
-		}
-	}
-
-	*n_regs = count;
-	return companhias;
 }
 
 void salvarCampoCompanhia(Companhia* companhia, Campo campo, char *valor){
@@ -250,8 +225,7 @@ void salvarCampoCompanhia(Companhia* companhia, Campo campo, char *valor){
 }
 
 /* Lê um registro de um arquivo verificando se o delimitador é um '|' ou um '#' */
-Companhia *lerCompanhia(FILE *in){
-	Companhia *companhia = criarCompanhia(0);
+Companhia *lerCompanhia(char *filename ,int offset){
 	char *valor_campo = NULL;
 	char c;
 	int campo = 1;
@@ -259,10 +233,23 @@ Companhia *lerCompanhia(FILE *in){
 	int run = 1;
 	char *buffer;
 
+	FILE *fp = fopen(filename,"r");
+	fseek(fp,offset,SEEK_SET);
+
+	Companhia *companhia = criarCompanhia(0);
+
+	c = fgetc(fp);
+	if(c == FLAG_REMOVIDO){
+		do{ //ignora o resto dos caracteres até chegar no fim do regitro
+			fread(&c,sizeof(char),1,fp);
+		}while(c != DELIM_FIM_REG);
+
+		return NULL;
+	}else fseek(fp,-1,SEEK_CUR); //caso seja um registro valido volta para imprimi-lo completo
 
 	for(int i=0;i<2;i++){ //le os dois campos cnpj
 		buffer = (char*) malloc(sizeof(char) * (TAMANHO_CNPJ));
-		fread(buffer,sizeof(char),TAMANHO_CNPJ,in);
+		fread(buffer,sizeof(char),TAMANHO_CNPJ,fp);
 		if(!strcmp(buffer,CNPJ_NULO)){ //caso o campo seja nulo
 			free(buffer);
 			buffer = NULL;
@@ -272,7 +259,7 @@ Companhia *lerCompanhia(FILE *in){
 
 	for(int i=0;i<2;i++){ //le os dois campos de data
 		buffer = (char*) malloc(sizeof(char) * (TAMANHO_DATA));
-		fread(buffer,sizeof(char),TAMANHO_DATA,in);
+		fread(buffer,sizeof(char),TAMANHO_DATA,fp);
 		if(!strcmp(buffer,DATA_NULA)){ //caso o campo seja nulo
 			free(buffer);
 			buffer = NULL;
@@ -281,14 +268,8 @@ Companhia *lerCompanhia(FILE *in){
 	}
 
 	while(run){
-		fread(&c,sizeof(char),1,in);
-		if(c == FLAG_REMOVIDO){
-			companhia = NULL;
-			run = 0;
-			do{ //ignora o resto dos caracteres até chegar no fim do regitro
-				fread(&c,sizeof(char),1,in);
-			}while(c != DELIM_FIM_REG);
-		}else if(c == DELIM_FIM_CAMPO){
+		c = fgetc(fp);
+		if(c == DELIM_FIM_CAMPO){
 			salvarCampoCompanhia(companhia,campo,valor_campo);
 			campo++;
 			valor_campo = NULL;
@@ -301,28 +282,7 @@ Companhia *lerCompanhia(FILE *in){
 		}
 	}
 
-	return companhia;
-}
-
-
-/* Busca por um registro atráves do seu numero, e o retorna */
-Companhia *buscarNumRegDelimitador(FILE *in, int query){
-	Companhia *companhia = NULL;
-	int end;
-	int count = 0;
-
-	fseek(in,0,SEEK_END);
-	end = ftell(in);
-	fseek(in,0,SEEK_SET);
-
-
-	while(ftell(in) < end){ //enquanto não chegou no fim do arquivo
-		companhia = lerCompanhia(in); //le a companhia
-		if(++count == query) //caso seja a procurada
-			break;
-		destruirCompanhia(companhia); //caso não seja não é preciso armazena-la
-		companhia = NULL;
-	}
+	fclose(fp);
 
 	return companhia;
 }

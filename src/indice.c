@@ -102,6 +102,11 @@ void inserirIndice(Indice *in ,char *cnpj,int offset) {
 	in->indice[in->size++] = reg;
 }
 
+void destruirRegIndice(RegIndice *reg){
+	if(reg->cnpj) free(reg->cnpj);
+	free(reg);
+}
+
 // Remove um indice
 int removerIndice(Indice *in, char *cnpj) {
 	int pos = buscarIndice(in, cnpj); //procura pelo indice do registro que será removido
@@ -110,7 +115,10 @@ int removerIndice(Indice *in, char *cnpj) {
 
 	destruirRegIndice(in->indice[pos]); //tira o indice da memoria
 
-	while (pos != in->size-1) in->indice[pos] = in->indice[++pos]; //shifta o resto do vetor
+	while(pos != in->size-1){ //shifta o resto do vetor
+		in->indice[pos] = in->indice[pos+1];
+		pos++;
+	}
 
 	in->size--; //reduz o tamanho do vetor de indices
 
@@ -129,11 +137,6 @@ void imprimirIndice(FILE *indice) {
 		printf("%s | %d\n",r->cnpj,r->offset);
 		destruirRegIndice(r);
 	}
-}
-
-void destruirRegIndice(RegIndice *reg){
-	if(reg->cnpj) free(reg->cnpj);
-	free(reg);
 }
 
 void destruirIndice(Indice *in) {

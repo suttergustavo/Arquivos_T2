@@ -12,12 +12,11 @@ Joice Aurino - 8530851
 #define _REGISTRO_DELIMITADOR_H_
 
 #include <companhias.h>
+#include <indice.h>
 
 int escreverCompanhia(char*,Companhia*);
-void imprimirTodos(FILE *);
-Companhia *buscarNumRegDelimitador(FILE *,int);
-Companhia *lerCompanhia(FILE *);
-Companhia **buscarCampoDelimitador(FILE *, Campo, char *, int *);
-void removerRegistro(FILE*,int);
+void imprimirTodos(char *, Indice*);
+Companhia *lerCompanhia(char *, int);
+void removerRegistro(char*,int);
 
 #endif

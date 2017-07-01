@@ -24,9 +24,8 @@ void csv2dados(Indice *indice){
 	}
 }
 
-void dados2tela(){
-	FILE *in = fopen("out","r");
-	imprimirTodos(in);
+void dados2tela(Indice *idx){
+	imprimirTodos("out",idx);
 }
 
 void indice2tela(){
@@ -35,12 +34,10 @@ void indice2tela(){
 }
 
 void removerCompanhia(Indice *idx){
-	FILE *in = fopen("out","r+");
-	removerRegistro(in,4);
-	removerRegistro(in,175);
+	removerRegistro("out",4);
+	removerRegistro("out",175);
 	removerIndice(idx,"92.659.614/0001-06");
 	removerIndice(idx,"01.851.771/0001-55");
-	fclose(in);
 }
 
 // void testeBuscaIndice() {
@@ -72,7 +69,7 @@ int main(int argc, char *argv[]){
 	while(scanf("%d",&op) && op){
 		if(op == 1) csv2dados(indice);
 		if(op == 2) removerCompanhia(indice);
-		if(op == 3) dados2tela();
+		if(op == 3) dados2tela(indice);
 		if(op == 4) indice2tela();
 		// if(op == 5) testeBuscaIndice();
 		if(op == 6) printIndice(indice);

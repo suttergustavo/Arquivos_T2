@@ -23,8 +23,8 @@ void validadeIndice(FILE *, Validade);
 void inserirIndice(Indice *,char *,int );
 int removerIndice(Indice *, char *);
 void imprimirIndice(FILE *);
-void destruirIndice(RegIndice *);
-void destruirIndiceCompleto(Indice *);
+void destruirRegIndice(RegIndice *);
+void destruirIndice(Indice *);
 Indice *criarIndice();
 
 #endif
