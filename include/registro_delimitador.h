@@ -15,7 +15,6 @@ Joice Aurino - 8530851
 
 int escreverCompanhia(FILE*,Companhia*);
 void imprimirTodos(FILE *);
-Companhia *buscarIndice(FILE *, FILE *, char *);
 Companhia *buscarNumRegDelimitador(FILE *,int);
 Companhia *lerCompanhia(FILE *);
 Companhia **buscarCampoDelimitador(FILE *, Campo, char *, int *);

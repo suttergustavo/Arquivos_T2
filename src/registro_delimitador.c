@@ -72,33 +72,6 @@ void imprimirTodos(FILE *in){
 	}
 }
 
-// Busca uma companhia a partir do indice
-Companhia *buscarIndice(FILE *in, FILE *indice, char *cnpj) {
-	Companhia *companhia;
-	RegIndice *reg;
-	int end, offset;
-
-	fseek(indice,0,SEEK_END);
-	end = (int) ftell(indice);
-	fseek(indice,0,SEEK_SET);
-
-	while(ftell(indice) < end){
-		reg = lerIndice(indice);
-		if(possuiIndiceProcurado(reg, cnpj)){
-			offset = reg->offset;
-
-			fseek(in,offset,SEEK_SET);
-			companhia = lerCompanhia(in);
-
-			return companhia;
-		}else{
-			destruirIndice(reg);
-		}
-	}
-
-	return NULL;
-}
-
 /* Busca por registros atráves de um campo passado pelo usuário, e o retorna todos encontrados */
 Companhia **buscarCampoDelimitador(FILE *in, Campo campo, char *query, int *n_regs){
 	Companhia *companhia,**companhias = NULL;
