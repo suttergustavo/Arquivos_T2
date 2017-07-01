@@ -47,7 +47,8 @@ void indice2tela(){
 
 void removerCompanhia(){
 	FILE *in = fopen("out","r+");
-	removerRegistro(in,179);
+	removerRegistro(in,4);
+	removerRegistro(in,175);
 }
 
 

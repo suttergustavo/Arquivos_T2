@@ -191,17 +191,10 @@ Companhia **lerCSVCompleto(char *filename, int *n_companhias){
 int getTamanhoCompanhia(Companhia *companhia){
 	int tamanho = 0;
 	
-	if(companhia->cnpj) tamanho += strlen(companhia->cnpj)+1; //tamanho da string + '\0'
-	tamanho++; //delimitador fim de campo
-
-	if(companhia->cnpj_auditoria) tamanho += strlen(companhia->cnpj_auditoria)+1; //tamanho da string + '\0'
-	tamanho++; //delimitador fim de campo
-
-	if(companhia->data_registro) tamanho += strlen(companhia->data_registro)+1; //tamanho da string + '\0'
-	tamanho++; //delimitador fim de campo
-
-	if(companhia->data_cancelamento) tamanho += strlen(companhia->data_cancelamento)+1; //tamanho da string + '\0'
-	tamanho++; //delimitador fim de campo
+	tamanho += TAMANHO_CNPJ; //tamanho da string + '\0'
+	tamanho += TAMANHO_CNPJ; //tamanho da string + '\0'
+	tamanho += TAMANHO_DATA; //tamanho da string + '\0'
+	tamanho += TAMANHO_DATA; //tamanho da string + '\0'
 
 	if(companhia->nome_social) tamanho += strlen(companhia->nome_social)+1; //tamanho da string + '\0'
 	tamanho++; //delimitador fim de campo

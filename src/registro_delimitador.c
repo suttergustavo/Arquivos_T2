@@ -30,8 +30,9 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 	}
 
 	int tamanho_procurado = getTamanhoCompanhia(companhia); //é preciso saber o tamanho doregistro para encontrar a posição adequada
+	printf("tamanho que vai ser inserido: %d\n",tamanho_procurado);
 
-	//procura estaço para reutilização do espaco
+	//procura espaço para reutilização do espaco
 	int curr_offset,prox_offset,tam_atual;
 	int ant_offset = 0;
 	fseek(out,0,SEEK_SET);
@@ -40,7 +41,9 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 	while(curr_offset != -1){
 		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
 		fread(&tam_atual,sizeof(int),1,out);
+		printf("tam atual %d procurando %d\n",tam_atual,tamanho_procurado);
 		if(tam_atual >= tamanho_procurado){
+			printf("coube!\n");
 			//religa a lista
 			fread(&prox_offset,sizeof(int),1,out);
 			fseek(out,ant_offset,SEEK_SET);
@@ -96,33 +99,98 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 	return offset;
 }
 
-void removerRegistro(FILE *out, int offset){
+void firstFit(FILE *fp, int offset, int tamanho){
 	char rem = '*';
+
+	//a cabeça da lista vai passar a ser o proximo elemento
+	int next_elem; //o proximo elemento na lista ligada
+	fseek(fp,0,SEEK_SET); //posicao do regitro de cabeçalho
+	fread(&next_elem,sizeof(int),1,fp);
+	
+	//a nova cabeça da lista é o elemento sendo removido agora
+	fseek(fp,0,SEEK_SET);
+	fwrite(&offset,sizeof(int),1,fp);
+
+	//o registro é removido logicamente, escrevendo '*',tamanho do registro e prox na lista de removidos
+	fseek(fp,offset,SEEK_SET);
+	fwrite(&rem,sizeof(char),1,fp); //escreve *
+	fwrite(&tamanho,sizeof(int),1,fp); //escreve o tamanho do registro
+	fwrite(&next_elem,sizeof(int),1,fp); //escreve o offset do prox elemento na lista
+}
+
+
+void worstFit(FILE *fp,int offset,int tamanho){
+	char rem = '*';
+	int end_offset_prox = 0;//porque a primeiro valor está no cabeçalho do arquivo
+	int offset_prox;
+	int tam_prox;
+	while(1){
+		fseek(fp,end_offset_prox,SEEK_SET);
+		fread(&offset_prox,sizeof(int),1,fp);
+
+		if(offset_prox != -1){
+			fseek(fp,offset_prox+sizeof(char),SEEK_SET);//+sizeof(char) pra pular o byte de romovido('*')
+			fread(&tam_prox,sizeof(int),1,fp);
+
+			if(tam_prox > tamanho){//se o tamanho do elemento for menor continua andando na lista
+				end_offset_prox = ftell(fp);	
+				continue; 
+			}
+		}	
+		fseek(fp,end_offset_prox,SEEK_SET); //proximo do anterior passa a ser o novo
+		fwrite(&offset,sizeof(int),1,fp);
+
+		fseek(fp,offset,SEEK_SET);
+		fwrite(&rem,sizeof(char),1,fp); //escreve *
+		fwrite(&tamanho,sizeof(int),1,fp); //escreve o tamanho do registro
+		fwrite(&offset_prox,sizeof(int),1,fp); //proximo do novo passa a ser o proximo do anterior
+
+		break;
+	}
+}
+
+void bestFit(FILE *fp,int offset,int tamannho){
+	char rem = '*';
+	int end_offset_prox = 0;//porque a primeiro valor está no cabeçalho do arquivo
+	int offset_prox;
+	int tam_prox;
+	while(1){
+		fseek(fp,end_offset_prox,SEEK_SET);
+		fread(&offset_prox,sizeof(int),1,fp);
+
+		if(offset_prox != -1){
+			fseek(fp,offset_prox+sizeof(char),SEEK_SET);//+sizeof(char) pra pular o byte de romovido('*')
+			fread(&tam_prox,sizeof(int),1,fp);
+
+			if(tam_prox < tamannho){//se o tamanho do elemento for menor continua andando na lista
+				end_offset_prox = ftell(fp);	
+				continue; 
+			}
+		}	
+		fseek(fp,end_offset_prox,SEEK_SET); //proximo do anterior passa a ser o novo
+		fwrite(&offset,sizeof(int),1,fp);
+
+		fseek(fp,offset,SEEK_SET);
+		fwrite(&rem,sizeof(char),1,fp); //escreve *
+		fwrite(&tamannho,sizeof(int),1,fp); //escreve o tamanho do registro
+		fwrite(&offset_prox,sizeof(int),1,fp); //proximo do novo passa a ser o proximo do anterior
+
+		break;
+	}
+}
+
+void removerRegistro(FILE *out, int offset){
 
 	fseek(out,offset,SEEK_SET);
 
 	//pega o tamanho do registro que vai ser removido
-	char c;
-	int count = 0;
+	char c = 0;
+	int tamanho = 0;
 	while(c != DELIM_FIM_REG){
 		c = fgetc(out);
-		count++;
+		tamanho++;
 	}
 
-	//a cabeça da lista vai passar a ser o proximo elemento
-	int next_elem; //o proximo elemento na lista ligada
-	fseek(out,0,SEEK_SET); //posicao do regitro de cabeçalho
-	fread(&next_elem,sizeof(int),1,out);
-	
-	//a nova cabeça da lista é o elemento sendo removido agora
-	fseek(out,0,SEEK_SET);
-	fwrite(&offset,sizeof(int),1,out);
-
-	//o registro é removido logicamente, escrevendo '*',tamanho do registro e prox na lista de removidos
-	fseek(out,offset,SEEK_SET);
-	fwrite(&rem,sizeof(char),1,out); //escreve *
-	fwrite(&count,sizeof(int),1,out); //escreve o tamanho do registro
-	fwrite(&next_elem,sizeof(int),1,out); //escreve o offset do prox elemento na lista
 }
 
 /* Imprime todos os registros de um arquivo */
