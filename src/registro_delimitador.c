@@ -60,8 +60,8 @@ int escreverCompanhia(char *filename,Companhia *companhia) {
 
 
 	int offset = (int) ftell(out);
-	char cnpj_nulo[TAMANHO_CNPJ + 1] = CNPJ_NULO;
-	char data_nula[TAMANHO_DATA + 1] = DATA_NULA;
+	char cnpj_nulo[TAMANHO_CNPJ] = CNPJ_NULO;
+	char data_nula[TAMANHO_DATA] = DATA_NULA;
 
 	//escreve os campos de tamanho fixo tratando o nulo
 
