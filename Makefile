@@ -1,6 +1,5 @@
 all:
 	gcc src/*.c -o prog -g -std=c99 -I./include -Wall
-	rm xurbo_*
 run:
 	./prog
 debug:

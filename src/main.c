@@ -6,44 +6,48 @@
 #include <indice.h>
 #include <projeto.h>
 
-void csv2dados(){
-	
-}
-
-void dados2tela(Indice *idx){
-	imprimirTodos("out",idx);
-}
-
-void indice2tela(){
-	FILE *in = fopen("indice.dat","r");
-	imprimirIndice(in);
-}
-
-void printIndice(Indice *idx){
-	for(int i=0;i<idx->size;i++){
-		printf("%s %d\n",idx->indice[i]->cnpj,idx->indice[i]->offset);
-	}
-}
-
-void teste(){
-
-}
-
 int main(int argc, char *argv[]){
-	int op;
-	Projeto *p = iniciarProjeto("xurbo");
-	while(scanf("%d",&op) && op){
-		if(op == 1) inserirDoCSV(p,"in");
-		if(op == 2){
-			removerCompanhia(p,"92.659.614/0001-06");
-			removerCompanhia(p,"01.851.771/0001-55");
+	char *nome_projeto;
+	char *nome_csv;
+	char *cnpj;
+	Projeto *projeto;
+	Companhia *companhia;
+
+	printf("Digite o nome do projeto(Caso não exista ele será criado): ");
+	scanf("%ms",&nome_projeto);
+
+	projeto = iniciarProjeto(nome_projeto);
+
+	int cmd = 1;
+	while(cmd){
+		printf("1- Importar de CSV | 2- Inserir Individual | 3- Remover Companhia | 4- Visualizar Indices | 5- Visualizar Lista Removidos | 0- Salvar e Sair\n");
+		scanf("%d",&cmd);
+
+		switch(cmd){
+			case 1: //importar dados de CSV
+				printf("Digite o nome da arquivo CSV\n");
+				scanf("%ms",&nome_csv);
+				inserirDoCSV(projeto,nome_csv);
+				break;
+			case 2: //inserir companhia individual
+				companhia = lerCompanhiaIndividual();
+				inserirCompanhiaIndividual(projeto,companhia);
+				break;
+			case 3: //remover companhia
+				printf("Digite o CNPJ que deve ser removido(XX.XXX.XXX/XXXX-XX): \n");
+				scanf("%ms",&cnpj);
+				removerCompanhia(projeto,cnpj);
+				break;
+			case 4: //visualizar indices
+				imprimirIndices(projeto);
+				break;
+			case 5: //visualizar lista removidos
+				imprimirListas(projeto);
+				break;
 		}
-		if(op == 3) imprimirIndices(p);
-		if(op == 4){
-			Companhia *c = lerCompanhiaIndividual();
-			inserirCompanhiaIndividual(p,c);
-		}
-		if(op == 5) imprimirListas(p);
 	}
-	salvarIndices(p);
+
+	//salvando indice em disco
+
+	//liberando memoria
 }	

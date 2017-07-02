@@ -41,6 +41,11 @@ void inserirDoCSV(Projeto *projeto, char *arquivo_csv){
 	Companhia *companhia;
 	int offset;
 
+	if(csv == NULL){
+		printf("Arquivo CSV não encontrado\n");
+		return;
+	}
+
 	fseek(csv,0,SEEK_END);
 	int size = (int) ftell(csv);	
 	fseek(csv,0,SEEK_SET);
