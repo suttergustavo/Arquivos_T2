@@ -68,37 +68,40 @@ Indice *carregarIndice(char *filename) {
 	}
 	indice->size = count;
 
+
 	return indice;
 }
 
 int buscarIndice(Indice *in, char *cnpj) {
-	// int pos = in->size/2, start = 0, end = in->size - 1;
+	int pos = in->size/2, start = 0, end = in->size - 1;
 
-	// while (start < end) {
-	// 	if (!strcmp(cnpj, in->indice[pos]->cnpj)) return pos;
-	// 	else if (strcmp(cnpj, in->indice[pos]->cnpj) < 0) end = pos-1;
-	// 	else start = pos+1;
-	// }
-
-	// return -1; // nao encontrado
-
-	int pos = -1;
-	for(int i=0;i<in->size;i++){
-		if(!strcmp(in->indice[i]->cnpj,cnpj)){
-			pos = i;
-			break;
-		}
+	while (start <= end) {
+		pos = (start + end) / 2;
+		if (!strcmp(cnpj, in->indice[pos]->cnpj)) return pos;
+		else if (strcmp(cnpj, in->indice[pos]->cnpj) < 0) end = pos-1;
+		else start = pos+1;
 	}
 
-	return pos;
+	return -1; // nao encontrado
+
 }
 
 // Coloca o indice como valido ou invalido. Deve ser utilizado quando ocorrer uma inserçao, remoçao, atualização, ou quando o programa encerrar
-void validadeIndice(FILE *indice, Validade validade) {
+void validadeIndice(char *filename, Validade validade) {
+	FILE *indice = fopen(filename,"r+");
+
 	fseek(indice, 0, SEEK_SET);
 	fwrite(&validade, sizeof(int), 1, indice);
+
+	fclose(indice);
 }
 
+
+int compararRegIndice(const void *a, const void *b){
+	RegIndice *ra = *(RegIndice **)a;
+	RegIndice *rb = *(RegIndice **)b;
+	return strcmp(ra->cnpj,rb->cnpj);
+}
 
 // Insere no arquivo de indices da memoria
 void inserirIndice(Indice *in ,char *cnpj,int offset) {
@@ -108,19 +111,21 @@ void inserirIndice(Indice *in ,char *cnpj,int offset) {
 
 	in->indice = (RegIndice **) realloc(in->indice, sizeof(RegIndice *) * (in->size + 1));
 	in->indice[in->size++] = reg;
+
+	qsort(in->indice,in->size,sizeof(RegIndice*),compararRegIndice);
 }
 
 void destruirRegIndice(RegIndice *reg){
-	if(reg->cnpj) free(reg->cnpj);
 	free(reg);
 }
 
-// Remove um indice
+// Remove um indice e retorna offset
 int removerIndice(Indice *in, char *cnpj) {
 	int pos = buscarIndice(in, cnpj); //procura pelo indice do registro que será removido
 
-	if(pos == -1) return 0; //nao encontrado portanto não pode ser removido
+	if(pos == -1) return -1; //nao encontrado portanto não pode ser removido
 
+	int offset = in->indice[pos]->offset;
 	destruirRegIndice(in->indice[pos]); //tira o indice da memoria
 
 	while(pos != in->size-1){ //shifta o resto do vetor
@@ -130,7 +135,7 @@ int removerIndice(Indice *in, char *cnpj) {
 
 	in->size--; //reduz o tamanho do vetor de indices
 
-	return 1; //removido com sucesso
+	return offset; //removido com sucesso
 }
 
 void imprimirIndice(FILE *indice) {

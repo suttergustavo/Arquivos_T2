@@ -2,7 +2,7 @@
 #define _PROJETO_H_
 
 #include <indice.h>
-#include <companhia.h>
+#include <companhias.h>
 
 typedef struct Projeto Projeto;
 
@@ -20,6 +20,10 @@ struct Projeto{
 	unsigned char alterado;
 };
 
-Companhia *
+Projeto *iniciarProjeto(char *);
+void inserirDoCSV(Projeto *, char *);
+void removerCompanhia(Projeto *, char *);
+void imprimirIndices(Projeto *);
+void inserirCompanhiaIndividual(Projeto *, Companhia *);
 
 #endif

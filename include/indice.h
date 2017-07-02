@@ -19,7 +19,7 @@ typedef enum {
 void salvarIndice(char *, Indice *);
 Indice *carregarIndice(char *);
 int buscarIndice(Indice *, char *);
-void validadeIndice(FILE *, Validade);
+void validadeIndice(char*, Validade);
 void inserirIndice(Indice *,char *,int );
 int removerIndice(Indice *, char *);
 void imprimirIndice(FILE *);

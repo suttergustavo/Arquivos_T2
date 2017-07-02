@@ -14,9 +14,16 @@ Joice Aurino - 8530851
 #include <companhias.h>
 #include <indice.h>
 
+typedef enum {
+	FIRST_FIT,
+	BEST_FIT,
+	WORST_FIT
+}Estrategia;
+
+
 int escreverCompanhia(char*,Companhia*);
 void imprimirTodos(char *, Indice*);
 Companhia *lerCompanhia(char *, int);
-void removerRegistro(char*,int);
+void removerRegistro(char*,int,Estrategia);
 
 #endif

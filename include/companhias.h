@@ -65,6 +65,7 @@ void imprimirCompanhia(Companhia*);
 int possuiCampoProcurado(Companhia *, Campo, char *);
 /* Retorna o tamanho da companhia em bytes(leva em consideração os delimitadores que serão inseridos)*/
 int getTamanhoCompanhia(Companhia *);
+Companhia *lerCompanhiaIndividual();
 
 Companhia *lerCompanhiaCSV(FILE *);
 #endif

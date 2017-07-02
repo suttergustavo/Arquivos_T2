@@ -212,3 +212,7 @@ int getTamanhoCompanhia(Companhia *companhia){
 
 	return tamanho;
 }
+
+Companhia *lerCompanhiaIndividual(){
+	return NULL;
+}

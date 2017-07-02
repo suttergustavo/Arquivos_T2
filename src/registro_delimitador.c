@@ -180,7 +180,7 @@ void bestFit(FILE *fp,int offset,int tamanho){
 	}
 }
 
-void removerRegistro(char *filename, int offset){
+void removerRegistro(char *filename, int offset, Estrategia estrategia){
 	FILE *fp = fopen(filename,"r+");
 
 	fseek(fp,offset,SEEK_SET);
@@ -193,7 +193,9 @@ void removerRegistro(char *filename, int offset){
 		tamanho++;
 	}
 
-	firstFit(fp,offset,tamanho);
+	if(estrategia == FIRST_FIT) firstFit(fp,offset,tamanho);
+	if(estrategia == BEST_FIT) bestFit(fp,offset,tamanho);
+	if(estrategia == WORST_FIT) worstFit(fp,offset,tamanho);
 
 	fclose(fp);
 }
