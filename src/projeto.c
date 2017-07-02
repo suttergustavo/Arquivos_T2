@@ -125,9 +125,12 @@ void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 }
 
 void imprimirIndices(Projeto *projeto){
-	for(int i=0;i<projeto->first_fit->size;i++){
-		printf("%s\t\t%d\t%d\t%d\t\n",projeto->first_fit->indice[i]->cnpj,projeto->first_fit->indice[i]->offset,projeto->best_fit->indice[i]->offset,projeto->worst_fit->indice[i]->offset);
-	}
+	printf("---------------------------------------\n");
+	printf("|%19s|%5s|%5s|%5s|\n","CNPJ      ","First","Best","Worst");
+	printf("---------------------------------------\n");
+	for(int i=0;i<projeto->first_fit->size;i++)
+		printf("|%19s|%5d|%5d|%5d|\n",projeto->first_fit->indice[i]->cnpj,projeto->first_fit->indice[i]->offset,projeto->best_fit->indice[i]->offset,projeto->worst_fit->indice[i]->offset);
+	printf("---------------------------------------\n");
 	printf("\n");
 }
 
