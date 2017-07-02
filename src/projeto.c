@@ -33,6 +33,8 @@ Projeto *iniciarProjeto(char *nome){
 	projeto->best_fit = carregarIndice(projeto->nome_idx_bf, projeto->nome_dados_bf);
 	projeto->worst_fit = carregarIndice(projeto->nome_idx_wf, projeto->nome_dados_wf);
 
+	projeto->alterado = 0;
+
 	return projeto;
 }
 
@@ -68,11 +70,22 @@ void inserirDoCSV(Projeto *projeto, char *arquivo_csv){
 
 		offset = escreverCompanhia(projeto->nome_dados_wf,companhia,WORST_FIT);
 		inserirIndice(projeto->worst_fit,companhia->cnpj,offset);
+	
+		destruirCompanhia(companhia);
 	}
+
+	fclose(csv);
 }
 
 void removerCompanhia(Projeto *projeto, char *cnpj){
 	int offset;
+
+	if(projeto->alterado == 0){
+		projeto->alterado = 1;
+		validadeIndice(projeto->nome_idx_ff,INVALIDO);
+		validadeIndice(projeto->nome_idx_bf,INVALIDO);
+		validadeIndice(projeto->nome_idx_wf,INVALIDO);
+	}
 
 	offset = removerIndice(projeto->first_fit,cnpj);
 	if(offset != -1) removerRegistro(projeto->nome_dados_ff,offset,FIRST_FIT);
@@ -87,6 +100,13 @@ void removerCompanhia(Projeto *projeto, char *cnpj){
 void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 	int offset;
 
+	if(projeto->alterado == 0){
+		projeto->alterado = 1;
+		validadeIndice(projeto->nome_idx_ff,INVALIDO);
+		validadeIndice(projeto->nome_idx_bf,INVALIDO);
+		validadeIndice(projeto->nome_idx_wf,INVALIDO);
+	}
+
 	offset = escreverCompanhia(projeto->nome_dados_ff,companhia,FIRST_FIT);
 	inserirIndice(projeto->first_fit,companhia->cnpj,offset);
 
@@ -95,6 +115,7 @@ void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 
 	offset = escreverCompanhia(projeto->nome_dados_wf,companhia,WORST_FIT);
 	inserirIndice(projeto->worst_fit,companhia->cnpj,offset);
+
 }
 
 void imprimirIndices(Projeto *projeto){
@@ -114,4 +135,20 @@ void salvarIndices(Projeto *projeto){
 	salvarIndice(projeto->nome_idx_ff,projeto->first_fit);
 	salvarIndice(projeto->nome_idx_bf,projeto->best_fit);
 	salvarIndice(projeto->nome_idx_wf,projeto->worst_fit);
+}
+
+void freeProjeto(Projeto *projeto){
+	free(projeto->nome_projeto);
+	free(projeto->nome_dados_ff);
+	free(projeto->nome_dados_bf);
+	free(projeto->nome_dados_wf);
+	free(projeto->nome_idx_bf);
+	free(projeto->nome_idx_ff);
+	free(projeto->nome_idx_wf);
+
+	destruirIndice(projeto->best_fit);
+	destruirIndice(projeto->worst_fit);
+	destruirIndice(projeto->first_fit);
+
+	free(projeto);
 }

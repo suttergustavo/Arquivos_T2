@@ -7,7 +7,7 @@
 
 // Escreve no disco o indice 
 void escreverIndice(FILE *indice,RegIndice *registro_indice) {
-	fwrite(registro_indice->cnpj,sizeof(char),TAMANHO_CNPJ + 1,indice);
+	fwrite(registro_indice->cnpj,sizeof(char),TAMANHO_CNPJ,indice);
 	fwrite(&(registro_indice->offset),sizeof(int),1,indice);
 }
 
@@ -24,15 +24,17 @@ void salvarIndice(char *filename, Indice *in) {
 	validade = VALIDO;
 	fseek(fp, 0, SEEK_SET);
 	fwrite(&validade, sizeof(int), 1, fp);
+
+	fclose(fp);
 }
 
 
 // Leitura do indice individual do disco para memoria principal
 RegIndice *lerIndice(FILE *indice){
 	RegIndice *reg = (RegIndice*) malloc(sizeof(RegIndice));
-	reg->cnpj = (char*) malloc(sizeof(char) * TAMANHO_CNPJ + 1);
+	reg->cnpj = (char*) malloc(sizeof(char) * TAMANHO_CNPJ);
 
-	fread(reg->cnpj,sizeof(char),TAMANHO_CNPJ + 1,indice);
+	fread(reg->cnpj,sizeof(char),TAMANHO_CNPJ,indice);
 	fread(&reg->offset,sizeof(int),1,indice);
 
 	return reg;
@@ -53,7 +55,7 @@ Indice *recuperarIndice(char *filename) {
 		reg = lerCompanhiaRecuperacao(fp);
 		if(reg != NULL){
 			inserirIndice(indice,reg->cnpj,reg->offset);
-			free(reg);
+			destruirRegIndice(reg);
 		} 
 	}
 
@@ -70,7 +72,8 @@ Indice *carregarIndice(char *filename, char *dataname) {
 
 	if(fp == NULL){	//se não existe arquivo é porque o projeto é novo
 		printf("Arquivo inexistente, será criado\n");
-		fopen(filename,"w+"); //ja cria o arquivo para posteriomente ser usado(quando o indice for alterado será alterado o buty de validade)
+		fp = fopen(filename,"w+"); //ja cria o arquivo para posteriomente ser usado(quando o indice for alterado será alterado o buty de validade)
+		fclose(fp);
 		return indice;	
 	}
 
@@ -78,8 +81,10 @@ Indice *carregarIndice(char *filename, char *dataname) {
 	fread(&validade, sizeof(int), 1, fp);
 	if(validade == INVALIDO){ //se o byte de validade indicar que o arquivo está corrompido
 		printf("Arquivo de indice corrompido. Iniciando recuperação...\n");
+		destruirIndice(indice);//libera o indice de antes, ja que outro será criado
 		indice = recuperarIndice(dataname);
 		printf("Indice recuperado com sucesso!\n");
+		fclose(fp);
 		return indice;
 	}
 
@@ -95,6 +100,8 @@ Indice *carregarIndice(char *filename, char *dataname) {
 	indice->size = count;
 
 	printf("Arquivo de indice carregado com sucesso\n");
+
+	fclose(fp);
 
 	return indice;
 }
@@ -133,7 +140,8 @@ int compararRegIndice(const void *a, const void *b){
 // Insere no arquivo de indices da memoria
 void inserirIndice(Indice *in ,char *cnpj,int offset) {
 	RegIndice *reg = (RegIndice*) malloc(sizeof(RegIndice));
-	reg->cnpj = cnpj;
+	reg->cnpj = (char *) malloc(sizeof(char)*TAMANHO_CNPJ);
+	strcpy(reg->cnpj,cnpj);
 	reg->offset = offset;
 
 	in->indice = (RegIndice **) realloc(in->indice, sizeof(RegIndice *) * (in->size + 1));
@@ -143,6 +151,7 @@ void inserirIndice(Indice *in ,char *cnpj,int offset) {
 }
 
 void destruirRegIndice(RegIndice *reg){
+	free(reg->cnpj);
 	free(reg);
 }
 

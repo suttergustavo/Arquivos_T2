@@ -29,5 +29,5 @@ void salvarIndices(Projeto*);
 void imprimirListas(Projeto *);
 char *criarNomeArquivo(char *,char *);
 Projeto *iniciarProjeto(char *);
-
+void freeProjeto(Projeto*);
 #endif

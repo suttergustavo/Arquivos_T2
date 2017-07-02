@@ -28,15 +28,18 @@ int main(int argc, char *argv[]){
 				printf("Digite o nome da arquivo CSV\n");
 				scanf("%ms",&nome_csv);
 				inserirDoCSV(projeto,nome_csv);
+				free(nome_csv);
 				break;
 			case 2: //inserir companhia individual
 				companhia = lerCompanhiaIndividual();
 				inserirCompanhiaIndividual(projeto,companhia);
+				destruirCompanhia(companhia);
 				break;
 			case 3: //remover companhia
 				printf("Digite o CNPJ que deve ser removido(XX.XXX.XXX/XXXX-XX): \n");
 				scanf("%ms",&cnpj);
 				removerCompanhia(projeto,cnpj);
+				free(cnpj);
 				break;
 			case 4: //visualizar indices
 				imprimirIndices(projeto);
@@ -48,6 +51,7 @@ int main(int argc, char *argv[]){
 	}
 
 	//salvando indice em disco
-
+	salvarIndices(projeto);
 	//liberando memoria
+	freeProjeto(projeto);
 }	
