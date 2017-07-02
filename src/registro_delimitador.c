@@ -14,92 +14,6 @@ Joice Aurino - 8530851
 #include <registro_delimitador.h>
 #include <indice.h>
 
-/* Escreve companhia no arquivo de dados e retorna o byte offset */
-int escreverCompanhia(char *filename,Companhia *companhia) {
-	char delim_fim_campo = DELIM_FIM_CAMPO;
-	char delim_fim_reg = DELIM_FIM_REG;
-
-	FILE *out = NULL;
-	out = fopen(filename,"r+");
-	if(out == NULL)	out = fopen(filename,"w+"); //caso o arquivo não exista ele é criado 
-
-	//verificando se o arquivo possui cabeçalho(ou seja, se n acabou de ser criado)
-	fseek(out,0,SEEK_END);
-	if(ftell(out) == 0){//caso não tenha nada no arquivo
-		int cabeca_lista = -1;
-		fwrite(&cabeca_lista,sizeof(int),1,out); //escreve a cabeça da lista no cabeçalho
-	}
-
-	int tamanho_procurado = getTamanhoCompanhia(companhia); //é preciso saber o tamanho doregistro para encontrar a posição adequada
-	printf("tamanho que vai ser inserido: %d\n",tamanho_procurado);
-
-	//procura espaço para reutilização do espaco
-	int curr_offset,prox_offset,tam_atual;
-	int ant_offset = 0;
-	fseek(out,0,SEEK_SET);
-	fread(&curr_offset,sizeof(int),1,out);
-	fseek(out,0,SEEK_SET);
-	while(curr_offset != -1){
-		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
-		fread(&tam_atual,sizeof(int),1,out);
-		printf("tam atual %d procurando %d\n",tam_atual,tamanho_procurado);
-		if(tam_atual >= tamanho_procurado){
-			printf("coube!\n");
-			//religa a lista
-			fread(&prox_offset,sizeof(int),1,out);
-			fseek(out,ant_offset,SEEK_SET);
-			fwrite(&prox_offset,sizeof(int),1,out);
-			//sai do laço pq ja encontrou
-			break;
-		}
-		ant_offset = curr_offset + sizeof(int) + sizeof(char); //soma valores para acesso direto ao byte q se encontra o offset
-		fread(&curr_offset,sizeof(int),1,out);
-	}
-	//posiciona o ponteiro onde o registro deve ser inserido
-	if(curr_offset != -1) fseek(out,curr_offset,SEEK_SET);
-	else fseek(out,0,SEEK_END);
-
-	int offset = (int) ftell(out);
-	char cnpj_nulo[TAMANHO_CNPJ] = CNPJ_NULO;
-	char data_nula[TAMANHO_DATA] = DATA_NULA;
-
-
-	//escreve os campos de tamanho fixo tratando o nulo
-
-	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
-	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
-		
-	if(companhia->cnpj_auditoria) fwrite(companhia->cnpj_auditoria,sizeof(char),strlen(companhia->cnpj_auditoria)+1,out);
-	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
-	
-	if(companhia->data_registro) fwrite(companhia->data_registro,sizeof(char),strlen(companhia->data_registro)+1,out);
-	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
-	
-	if(companhia->data_cancelamento) fwrite(companhia->data_cancelamento,sizeof(char),strlen(companhia->data_cancelamento)+1,out);
-	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
-
-	//escreve cada campo variavel e um delimitador entre eles
-	if(companhia->nome_social) fwrite(companhia->nome_social,sizeof(char),strlen(companhia->nome_social)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
-	
-	if(companhia->nome_fantasia) fwrite(companhia->nome_fantasia,sizeof(char),strlen(companhia->nome_fantasia)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
-	
-	if(companhia->motivo_cancelamento) fwrite(companhia->motivo_cancelamento,sizeof(char),strlen(companhia->motivo_cancelamento)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
-	
-	if(companhia->nome_empresa) fwrite(companhia->nome_empresa,sizeof(char),strlen(companhia->nome_empresa)+1,out);
-	fwrite(&delim_fim_campo,sizeof(char),1,out);
-	
-
-	//escreve delimitador de fim de registro
-	fwrite(&delim_fim_reg, sizeof(char), 1, out); // escreve o delimitador de registro '#'
-
-	fclose(out);
-
-	return offset;
-}
-
 void firstFit(FILE *fp, int offset, int tamanho){
 	char rem = '*';
 
@@ -200,20 +114,101 @@ void removerRegistro(char *filename, int offset, Estrategia estrategia){
 	fclose(fp);
 }
 
-/* Imprime todos os registros de um arquivo */
-void imprimirTodos(char *filename, Indice* indice){
-	Companhia *companhia;
 
-	if(filename == NULL || indice == NULL) return;
+/* Escreve companhia no arquivo de dados e retorna o byte offset */
+int escreverCompanhia(char *filename,Companhia *companhia, Estrategia estrategia) {
+	char delim_fim_campo = DELIM_FIM_CAMPO;
+	char delim_fim_reg = DELIM_FIM_REG;
 
-	for(int i=0;i<indice->size;i++){
-		companhia = lerCompanhia(filename,indice->indice[i]->offset);
-		if(!companhia) continue;
-		imprimirCompanhia(companhia);
-		destruirCompanhia(companhia);
-		printf("----------------\n");
+	FILE *out = NULL;
+	out = fopen(filename,"r+");
+	if(out == NULL)	out = fopen(filename,"w+"); //caso o arquivo não exista ele é criado 
+
+	//verificando se o arquivo possui cabeçalho(ou seja, se n acabou de ser criado)
+	fseek(out,0,SEEK_END);
+	if(ftell(out) == 0){//caso não tenha nada no arquivo
+		int cabeca_lista = -1;
+		fwrite(&cabeca_lista,sizeof(int),1,out); //escreve a cabeça da lista no cabeçalho
 	}
+
+	int tamanho_procurado = getTamanhoCompanhia(companhia); //é preciso saber o tamanho doregistro para encontrar a posição adequada
+	printf("tamanho que vai ser inserido: %d\n",tamanho_procurado);
+
+	//procura espaço para reutilização do espaco
+	int curr_offset,prox_offset,tam_atual;
+	int ant_offset = 0;
+	fseek(out,0,SEEK_SET);
+	fread(&curr_offset,sizeof(int),1,out);
+	fseek(out,0,SEEK_SET);
+	while(curr_offset != -1){
+		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
+		fread(&tam_atual,sizeof(int),1,out);
+		printf("tam atual %d procurando %d\n",tam_atual,tamanho_procurado);
+		if(tam_atual >= tamanho_procurado){
+			printf("coube!\n");
+			//religa a lista
+			fread(&prox_offset,sizeof(int),1,out);
+			fseek(out,ant_offset,SEEK_SET);
+			fwrite(&prox_offset,sizeof(int),1,out);
+			//sai do laço pq ja encontrou
+			break;
+		}
+		ant_offset = curr_offset + sizeof(int) + sizeof(char); //soma valores para acesso direto ao byte q se encontra o offset
+		fread(&curr_offset,sizeof(int),1,out);
+	}
+	//posiciona o ponteiro onde o registro deve ser inserido
+	if(curr_offset != -1){
+		//insere o espaço que sobrou no registro na lista de removidos(EVITAR FRAGMENTAÇÃO)
+		if(tamanho_procurado < tam_atual){
+			fclose(out);
+			removerRegistro(filename,curr_offset+tamanho_procurado,estrategia);
+			out = fopen(filename,"r+");
+		}
+		fseek(out,curr_offset,SEEK_SET);
+	}else fseek(out,0,SEEK_END);
+
+
+	int offset = (int) ftell(out);
+	char cnpj_nulo[TAMANHO_CNPJ] = CNPJ_NULO;
+	char data_nula[TAMANHO_DATA] = DATA_NULA;
+
+
+	//escreve os campos de tamanho fixo tratando o nulo
+
+	if(companhia->cnpj) fwrite(companhia->cnpj,sizeof(char),strlen(companhia->cnpj)+1,out);
+	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
+		
+	if(companhia->cnpj_auditoria) fwrite(companhia->cnpj_auditoria,sizeof(char),strlen(companhia->cnpj_auditoria)+1,out);
+	else fwrite(cnpj_nulo,sizeof(char),strlen(cnpj_nulo)+1,out);
+	
+	if(companhia->data_registro) fwrite(companhia->data_registro,sizeof(char),strlen(companhia->data_registro)+1,out);
+	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
+	
+	if(companhia->data_cancelamento) fwrite(companhia->data_cancelamento,sizeof(char),strlen(companhia->data_cancelamento)+1,out);
+	else fwrite(data_nula,sizeof(char),strlen(data_nula)+1,out);
+
+	//escreve cada campo variavel e um delimitador entre eles
+	if(companhia->nome_social) fwrite(companhia->nome_social,sizeof(char),strlen(companhia->nome_social)+1,out);
+	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	
+	if(companhia->nome_fantasia) fwrite(companhia->nome_fantasia,sizeof(char),strlen(companhia->nome_fantasia)+1,out);
+	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	
+	if(companhia->motivo_cancelamento) fwrite(companhia->motivo_cancelamento,sizeof(char),strlen(companhia->motivo_cancelamento)+1,out);
+	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	
+	if(companhia->nome_empresa) fwrite(companhia->nome_empresa,sizeof(char),strlen(companhia->nome_empresa)+1,out);
+	fwrite(&delim_fim_campo,sizeof(char),1,out);
+	
+
+	//escreve delimitador de fim de registro
+	fwrite(&delim_fim_reg, sizeof(char), 1, out); // escreve o delimitador de registro '#'
+
+	fclose(out);
+
+	return offset;
 }
+
 
 void salvarCampoCompanhia(Companhia* companhia, Campo campo, char *valor){
 	if(campo == CNPJ) companhia->cnpj = valor;

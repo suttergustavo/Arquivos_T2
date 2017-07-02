@@ -60,13 +60,13 @@ void inserirDoCSV(Projeto *projeto, char *arquivo_csv){
 	while(size > (int) ftell(csv)){
 		companhia = lerCompanhiaCSV(csv);
 
-		offset = escreverCompanhia(projeto->nome_dados_ff,companhia);
+		offset = escreverCompanhia(projeto->nome_dados_ff,companhia,FIRST_FIT);
 		inserirIndice(projeto->first_fit,companhia->cnpj,offset);
 
-		offset = escreverCompanhia(projeto->nome_dados_bf,companhia);
+		offset = escreverCompanhia(projeto->nome_dados_bf,companhia,BEST_FIT);
 		inserirIndice(projeto->best_fit,companhia->cnpj,offset);
 
-		offset = escreverCompanhia(projeto->nome_dados_wf,companhia);
+		offset = escreverCompanhia(projeto->nome_dados_wf,companhia,WORST_FIT);
 		inserirIndice(projeto->worst_fit,companhia->cnpj,offset);
 	}
 }
@@ -87,13 +87,13 @@ void removerCompanhia(Projeto *projeto, char *cnpj){
 void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 	int offset;
 
-	offset = escreverCompanhia(projeto->nome_dados_ff,companhia);
+	offset = escreverCompanhia(projeto->nome_dados_ff,companhia,FIRST_FIT);
 	inserirIndice(projeto->first_fit,companhia->cnpj,offset);
 
-	offset = escreverCompanhia(projeto->nome_dados_bf,companhia);
+	offset = escreverCompanhia(projeto->nome_dados_bf,companhia,BEST_FIT);
 	inserirIndice(projeto->best_fit,companhia->cnpj,offset);
 
-	offset = escreverCompanhia(projeto->nome_dados_wf,companhia);
+	offset = escreverCompanhia(projeto->nome_dados_wf,companhia,WORST_FIT);
 	inserirIndice(projeto->worst_fit,companhia->cnpj,offset);
 }
 

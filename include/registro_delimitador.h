@@ -21,7 +21,7 @@ typedef enum {
 }Estrategia;
 
 
-int escreverCompanhia(char*,Companhia*);
+int escreverCompanhia(char*,Companhia*,Estrategia);
 void imprimirTodos(char *, Indice*);
 Companhia *lerCompanhia(char *, int);
 void removerRegistro(char*,int,Estrategia);
