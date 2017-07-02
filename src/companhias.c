@@ -214,5 +214,66 @@ int getTamanhoCompanhia(Companhia *companhia){
 }
 
 Companhia *lerCompanhiaIndividual(){
-	return NULL;
+	Companhia *nova_companhia = criarCompanhia(1);
+
+	printf("Entre com com a nova companhia(Digite 'null' nos campos que devem ser nulos):\n");
+
+	
+	printf("CNPJ (XX.XXX.XXX/XXXX-XX): ");
+	scanf("%*c%[^\n]",nova_companhia->cnpj);
+	if(!strcmp(nova_companhia->cnpj,"null")){
+		free(nova_companhia->cnpj);
+		nova_companhia->cnpj = NULL;
+	}
+	
+	printf("Nome Social: ");
+	scanf("%*c%m[^\n]",&nova_companhia->nome_social);
+	if(!strcmp(nova_companhia->nome_social,"null")){
+		free(nova_companhia->nome_social);
+		nova_companhia->nome_social = NULL;
+	}
+	
+	printf("Nome Fantasia: ");
+	scanf("%*c%m[^\n]",&nova_companhia->nome_fantasia);
+	if(!strcmp(nova_companhia->nome_fantasia,"null")){
+		free(nova_companhia->nome_fantasia);
+		nova_companhia->nome_fantasia = NULL;
+	}
+	
+	printf("Data registro(DD/MM/AA): ");
+	scanf("%*c%[^\n]",nova_companhia->data_registro);
+	if(!strcmp(nova_companhia->data_registro,"null")){
+		free(nova_companhia->data_registro);
+		nova_companhia->data_registro = NULL;
+	}
+	
+	printf("Data Cancelamento(DD/MM/AA): ");
+	scanf("%*c%[^\n]",nova_companhia->data_cancelamento);
+	if(!strcmp(nova_companhia->data_cancelamento,"null")){
+		free(nova_companhia->data_cancelamento);
+		nova_companhia->data_cancelamento = NULL;
+	}
+	
+	printf("Motivo Cancelamento: ");
+	scanf("%*c%m[^\n]",&nova_companhia->motivo_cancelamento);
+	if(!strcmp(nova_companhia->motivo_cancelamento,"null")){
+		free(nova_companhia->motivo_cancelamento);
+		nova_companhia->motivo_cancelamento = NULL;
+	}
+	
+	printf("Nome Auditoria: ");
+	scanf("%*c%m[^\n]",&nova_companhia->nome_empresa);
+	if(!strcmp(nova_companhia->nome_empresa,"null")){
+		free(nova_companhia->nome_empresa);
+		nova_companhia->nome_empresa = NULL;
+	}
+	
+	printf("CNPJ Auditoria (XX.XXX.XXX/XXXX-XX): ");
+	scanf("%*c%[^\n]",nova_companhia->cnpj_auditoria);
+	if(!strcmp(nova_companhia->cnpj_auditoria,"null")){
+		free(nova_companhia->cnpj_auditoria);
+		nova_companhia->cnpj_auditoria = NULL;
+	}
+
+	return nova_companhia;
 }
