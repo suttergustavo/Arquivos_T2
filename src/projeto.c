@@ -1,6 +1,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <unistd.h>
 #include <registro_delimitador.h>
 #include <projeto.h>
 
@@ -20,13 +23,16 @@ Projeto *iniciarProjeto(char *nome){
 	//nome que do projeto
 	projeto->nome_projeto = nome;
 
+	struct stat st = {0};
+	if (stat(nome, &st) == -1) mkdir(nome, 0700);
+
 	//nome dos arquivos que o projeto manipulará
-	projeto->nome_dados_ff = criarNomeArquivo(nome,"_dadosFF.dat");
-	projeto->nome_dados_bf = criarNomeArquivo(nome,"_dadosBF.dat");
-	projeto->nome_dados_wf = criarNomeArquivo(nome,"_dadosWF.dat");
-	projeto->nome_idx_ff = criarNomeArquivo(nome,"_indiceFF.dat");
-	projeto->nome_idx_bf = criarNomeArquivo(nome,"_indiceBF.dat");
-	projeto->nome_idx_wf = criarNomeArquivo(nome,"_indiceWF.dat");
+	projeto->nome_dados_ff = criarNomeArquivo(nome,"/dadosFF.dat");
+	projeto->nome_dados_bf = criarNomeArquivo(nome,"/dadosBF.dat");
+	projeto->nome_dados_wf = criarNomeArquivo(nome,"/dadosWF.dat");
+	projeto->nome_idx_ff = criarNomeArquivo(nome,"/indiceFF.dat");
+	projeto->nome_idx_bf = criarNomeArquivo(nome,"/indiceBF.dat");
+	projeto->nome_idx_wf = criarNomeArquivo(nome,"/indiceWF.dat");
 	
 	//carrega(ou cria caso,não existam) os indices do projeto
 	projeto->first_fit = carregarIndice(projeto->nome_idx_ff, projeto->nome_dados_ff);
