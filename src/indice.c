@@ -42,28 +42,22 @@ RegIndice *lerIndice(FILE *indice){
 Indice *recuperarIndice(char *filename) {
 	FILE *fp = fopen(filename, "r");
 	Indice *indice = criarIndice();
-	Companhia *c;
-	char *cnpj;
+	RegIndice *reg;
 
 	fseek(fp, 0, SEEK_END);
 	int size = (int) ftell(fp);	
-	fseek(fp, 0, SEEK_SET);
-	fclose(fp);
+	fseek(fp, 4, SEEK_SET);
 
 	//itera no arquivo de dados obtendo o indice
-	int offset = 4;
-	while (offset < size) {
-		c = lerCompanhia(filename, offset);
-
-		//copia o cnpj porque o resto do registro vai ser liberado da memoria
-		cnpj = (char *) malloc(sizeof(char)*TAMANHO_CNPJ);
-		strcpy(cnpj,c->cnpj);
-
-		inserirIndice(indice,cnpj, offset);
-		offset += getTamanhoCompanhia(c);
-		destruirCompanhia(c);
+	while (ftell(fp) < size) {
+		reg = lerCompanhiaRecuperacao(fp);
+		if(reg != NULL){
+			inserirIndice(indice,reg->cnpj,reg->offset);
+			free(reg);
+		} 
 	}
 
+	fclose(fp);
 	return indice;
 }
 

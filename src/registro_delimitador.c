@@ -14,6 +14,7 @@ Joice Aurino - 8530851
 #include <registro_delimitador.h>
 #include <indice.h>
 
+/* Insere um registro removido na lista usando estrategia first fit */
 void firstFit(FILE *fp, int offset, int tamanho){
 	char rem = '*';
 
@@ -33,7 +34,7 @@ void firstFit(FILE *fp, int offset, int tamanho){
 	fwrite(&next_elem,sizeof(int),1,fp); //escreve o offset do prox elemento na lista
 }
 
-
+/* Insere um registro removido na lista usando estrategia worst fit */
 void worstFit(FILE *fp,int offset,int tamanho){
 	char rem = '*';
 	int end_offset_prox = 0;//porque a primeiro valor está no cabeçalho do arquivo
@@ -64,6 +65,7 @@ void worstFit(FILE *fp,int offset,int tamanho){
 	}
 }
 
+/* Insere um registro removido na lista usando estrategia best fit */
 void bestFit(FILE *fp,int offset,int tamanho){
 	char rem = '*';
 	int end_offset_prox = 0;//porque a primeiro valor está no cabeçalho do arquivo
@@ -94,6 +96,7 @@ void bestFit(FILE *fp,int offset,int tamanho){
 	}
 }
 
+/* Remove logicamente um registro e o coloca na lista de removidos*/
 void removerRegistro(char *filename, int offset, Estrategia estrategia){
 	FILE *fp = fopen(filename,"r+");
 
@@ -132,7 +135,6 @@ int escreverCompanhia(char *filename,Companhia *companhia, Estrategia estrategia
 	}
 
 	int tamanho_procurado = getTamanhoCompanhia(companhia); //é preciso saber o tamanho doregistro para encontrar a posição adequada
-	printf("tamanho que vai ser inserido: %d\n",tamanho_procurado);
 
 	//procura espaço para reutilização do espaco
 	int curr_offset,prox_offset,tam_atual;
@@ -143,9 +145,7 @@ int escreverCompanhia(char *filename,Companhia *companhia, Estrategia estrategia
 	while(curr_offset != -1){
 		fseek(out,curr_offset+sizeof(char),SEEK_SET); //+sizeof(char) para ignorar o '*',q n tem utilidade nessa parte do projeto
 		fread(&tam_atual,sizeof(int),1,out);
-		printf("tam atual %d procurando %d\n",tam_atual,tamanho_procurado);
 		if(tam_atual >= tamanho_procurado){
-			printf("coube!\n");
 			//religa a lista
 			fread(&prox_offset,sizeof(int),1,out);
 			fseek(out,ant_offset,SEEK_SET);
@@ -282,6 +282,31 @@ Companhia *lerCompanhia(char *filename ,int offset){
 	fclose(fp);
 
 	return companhia;
+}
+
+/* Função de leitura usada na recuperação de indices corrompidos */
+RegIndice *lerCompanhiaRecuperacao(FILE *fp){
+	char c = fgetc(fp);
+	if(c == FLAG_REMOVIDO){ //se for um registro removido
+		do{ //avanaça para o prox registro
+			fread(&c,sizeof(char),1,fp);
+		}while(c != DELIM_FIM_REG);
+
+		return NULL;
+	}
+	fseek(fp,-1,SEEK_CUR);
+
+	RegIndice *reg = (RegIndice*) malloc(sizeof(RegIndice));
+	reg->cnpj = (char *) malloc(sizeof(char)*TAMANHO_CNPJ);
+	
+	reg->offset = (int) ftell(fp);
+	fread(reg->cnpj,sizeof(char),TAMANHO_CNPJ,fp);
+
+	do{ //avanaça para o prox registro
+		fread(&c,sizeof(char),1,fp);
+	}while(c != DELIM_FIM_REG);
+
+	return reg;
 }
 
 void imprimirListaRemovidos(char *filename,char *label){

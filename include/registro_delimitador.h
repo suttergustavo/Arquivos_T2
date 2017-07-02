@@ -26,5 +26,6 @@ void imprimirTodos(char *, Indice*);
 Companhia *lerCompanhia(char *, int);
 void removerRegistro(char*,int,Estrategia);
 void imprimirListaRemovidos(char *,char *);
+RegIndice *lerCompanhiaRecuperacao(FILE *);
 
 #endif
