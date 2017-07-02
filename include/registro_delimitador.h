@@ -25,5 +25,6 @@ int escreverCompanhia(char*,Companhia*);
 void imprimirTodos(char *, Indice*);
 Companhia *lerCompanhia(char *, int);
 void removerRegistro(char*,int,Estrategia);
+void imprimirListaRemovidos(char *,char *);
 
 #endif

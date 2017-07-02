@@ -25,5 +25,7 @@ void inserirDoCSV(Projeto *, char *);
 void removerCompanhia(Projeto *, char *);
 void imprimirIndices(Projeto *);
 void inserirCompanhiaIndividual(Projeto *, Companhia *);
+void salvarIndices(Projeto*);
+void imprimirListas(Projeto *);
 
 #endif

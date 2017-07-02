@@ -73,7 +73,7 @@ Indice *carregarIndice(char *filename) {
 }
 
 int buscarIndice(Indice *in, char *cnpj) {
-	int pos = in->size/2, start = 0, end = in->size - 1;
+	int pos,start = 0, end = in->size - 1;
 
 	while (start <= end) {
 		pos = (start + end) / 2;

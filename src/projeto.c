@@ -97,3 +97,15 @@ void imprimirIndices(Projeto *projeto){
 	}
 	printf("\n");
 }
+
+void imprimirListas(Projeto *projeto){
+	imprimirListaRemovidos(projeto->nome_dados_ff,"First Fit");
+	imprimirListaRemovidos(projeto->nome_dados_bf,"Best Fit");
+	imprimirListaRemovidos(projeto->nome_dados_wf,"Worst Fit");
+}
+
+void salvarIndices(Projeto *projeto){
+	salvarIndice(projeto->nome_idx_ff,projeto->first_fit);
+	salvarIndice(projeto->nome_idx_bf,projeto->best_fit);
+	salvarIndice(projeto->nome_idx_wf,projeto->worst_fit);
+}

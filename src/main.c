@@ -43,5 +43,7 @@ int main(int argc, char *argv[]){
 			Companhia *c = lerCompanhiaIndividual();
 			inserirCompanhiaIndividual(p,c);
 		}
+		if(op == 5) imprimirListas(p);
 	}
+	salvarIndices(p);
 }	

@@ -288,3 +288,25 @@ Companhia *lerCompanhia(char *filename ,int offset){
 
 	return companhia;
 }
+
+void imprimirListaRemovidos(char *filename,char *label){
+	FILE *fp = fopen(filename,"r");
+	int offset,tamanho,aux;
+
+	if(fp == NULL) return;
+
+	fread(&offset,sizeof(int),1,fp);
+
+	if(offset == -1) printf("Nenhum elemento na lista de removidos\n");	
+	else printf("%s:\n\t",label);
+	while(offset != -1){
+		aux = offset;
+		fseek(fp,offset+sizeof(char),SEEK_SET); //sizeof char para pular o byte dee flag da remoção
+		fread(&tamanho,sizeof(int),1,fp);
+		fread(&offset,sizeof(int),1,fp);
+		if(offset != -1) printf("(Tamanho: %4d | Offset: %4d) -> ",tamanho,aux); //caso não seja o ultimo da lista
+		else printf("(Tamanho: %4d | Offset: %4d)\n",tamanho,aux);
+	}
+
+	fclose(fp);
+}
