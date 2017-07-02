@@ -27,5 +27,7 @@ void imprimirIndices(Projeto *);
 void inserirCompanhiaIndividual(Projeto *, Companhia *);
 void salvarIndices(Projeto*);
 void imprimirListas(Projeto *);
+char *criarNomeArquivo(char *,char *);
+Projeto *iniciarProjeto(char *);
 
 #endif

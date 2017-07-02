@@ -38,8 +38,37 @@ RegIndice *lerIndice(FILE *indice){
 	return reg;
 }
 
+// recupera indice a partir do arquivo de dados
+Indice *recuperarIndice(char *filename) {
+	FILE *fp = fopen(filename, "r");
+	Indice *indice = criarIndice();
+	Companhia *c;
+	char *cnpj;
+
+	fseek(fp, 0, SEEK_END);
+	int size = (int) ftell(fp);	
+	fseek(fp, 0, SEEK_SET);
+	fclose(fp);
+
+	//itera no arquivo de dados obtendo o indice
+	int offset = 4;
+	while (offset < size) {
+		c = lerCompanhia(filename, offset);
+
+		//copia o cnpj porque o resto do registro vai ser liberado da memoria
+		cnpj = (char *) malloc(sizeof(char)*TAMANHO_CNPJ);
+		strcpy(cnpj,c->cnpj);
+
+		inserirIndice(indice,cnpj, offset);
+		offset += getTamanhoCompanhia(c);
+		destruirCompanhia(c);
+	}
+
+	return indice;
+}
+
 // Cria arquivo de indices completo na memoria a partir do indice no disco
-Indice *carregarIndice(char *filename) {
+Indice *carregarIndice(char *filename, char *dataname) {
 	Indice *indice = criarIndice();
 	int count = 0, validade;
 
@@ -55,8 +84,11 @@ Indice *carregarIndice(char *filename) {
 	fread(&validade, sizeof(int), 1, fp);
 	if(validade == INVALIDO){ //se o byte de validade indicar que o arquivo está corrompido
 		printf("Arquivo de indice corrompido. Iniciando recuperação...\n");
+		indice = recuperarIndice(dataname);
+		printf("Indice recuperado com sucesso!\n");
 		return indice;
 	}
+
 
 	fseek(fp, 0, SEEK_END);
 	int size = (int) ftell(fp);	
@@ -68,6 +100,7 @@ Indice *carregarIndice(char *filename) {
 	}
 	indice->size = count;
 
+	printf("Arquivo de indice carregado com sucesso\n");
 
 	return indice;
 }
