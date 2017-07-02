@@ -1,5 +1,5 @@
 #include <stdlib.h>
-#include <stdio.h.h>
+#include <stdio.h>
 #include <string.h>
 #include <registro_delimitador.h>
 #include <projeto.h>
@@ -14,7 +14,7 @@ char *criarNomeArquivo(char *str1,char *str2){
 
 /* Dado um nome um projeto é iniciado, ou recuperado do disco */
 Projeto *iniciarProjeto(char *nome){
-	Projeto *projeto = (Projeto) malloc(sizeof(Projeto));
+	Projeto *projeto = (Projeto *) malloc(sizeof(Projeto));
 	
 	//nome que do projeto
 	projeto->nome_projeto = nome;
@@ -28,9 +28,9 @@ Projeto *iniciarProjeto(char *nome){
 	projeto->nome_idx_wf = criarNomeArquivo(nome,"_indiceWF.dat");
 	
 	//carrega(ou cria caso,não existam) os indices do projeto
-	projeto->first_fit = carregarIndice(projeto->nome_idx_ff);
-	projeto->best_fit = carregarIndice(projeto->nome_idx_bf);
-	projeto->worst_fit = carregarIndice(projeto->nome_idx_wf);
+	projeto->first_fit = carregarIndice(projeto->nome_idx_ff, projeto->nome_dados_ff);
+	projeto->best_fit = carregarIndice(projeto->nome_idx_bf, projeto->nome_dados_bf);
+	projeto->worst_fit = carregarIndice(projeto->nome_idx_wf, projeto->nome_dados_wf);
 
 	return projeto;
 }

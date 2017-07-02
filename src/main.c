@@ -48,9 +48,10 @@ void printIndice(Indice *idx){
 
 int main(int argc, char *argv[]){
 	int op;
-	char *idx_file;
+	char *idx_file, *data_file;
 	scanf("%ms",&idx_file);
-	Indice *indice = carregarIndice(idx_file);
+	scanf("%ms",&data_file);
+	Indice *indice = carregarIndice(idx_file, data_file);
 	while(scanf("%d",&op) && op){
 		if(op == 1) csv2dados(indice);
 		if(op == 2) removerCompanhia(indice);

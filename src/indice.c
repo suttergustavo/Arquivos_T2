@@ -38,8 +38,31 @@ RegIndice *lerIndice(FILE *indice){
 	return reg;
 }
 
+// recupera indice a partir do arquivo de dados
+Indice *recuperarIndice(char *filename) {
+	FILE *fp = fopen(filename, "r");
+	Indice *indice = criarIndice();
+	Companhia *c;
+	int offset = 0;
+
+	fseek(fp, 0, SEEK_END);
+	int size = (int) ftell(fp);	
+	fseek(fp, 0, SEEK_SET);
+
+	while (offset < size) {
+		c = lerCompanhia(filename, offset);
+		inserirIndice(indice, c->cnpj, offset);
+		offset += getTamanhoCompanhia(c);
+		destruirCompanhia(c);
+	}
+
+	fclose(fp);
+
+	return indice;
+}
+
 // Cria arquivo de indices completo na memoria a partir do indice no disco
-Indice *carregarIndice(char *filename) {
+Indice *carregarIndice(char *filename, char *dataname) {
 	Indice *indice = criarIndice();
 	int count = 0, validade;
 
@@ -55,6 +78,7 @@ Indice *carregarIndice(char *filename) {
 	fread(&validade, sizeof(int), 1, fp);
 	if(validade == INVALIDO){ //se o byte de validade indicar que o arquivo está corrompido
 		printf("Arquivo de indice corrompido. Iniciando recuperação...\n");
+		indice = recuperarIndice(dataname);
 		return indice;
 	}
 

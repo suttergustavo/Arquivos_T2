@@ -2,7 +2,7 @@
 #define _PROJETO_H_
 
 #include <indice.h>
-#include <companhia.h>
+#include <companhias.h>
 
 typedef struct Projeto Projeto;
 
@@ -20,6 +20,7 @@ struct Projeto{
 	unsigned char alterado;
 };
 
-Companhia *
+char *criarNomeArquivo(char *,char *);
+Projeto *iniciarProjeto(char *);
 
 #endif
