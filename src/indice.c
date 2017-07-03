@@ -5,13 +5,20 @@
 #include <registro_delimitador.h>
 #include <indice.h>
 
-// Escreve no disco o indice 
+
+/* Desaloca o RegIndice da memoria*/
+void destruirRegIndice(RegIndice *reg){
+	free(reg->cnpj);
+	free(reg);
+}
+
+/* Escreve o indice no disco*/
 void escreverIndice(FILE *indice,RegIndice *registro_indice) {
 	fwrite(registro_indice->cnpj,sizeof(char),TAMANHO_CNPJ,indice);
 	fwrite(&(registro_indice->offset),sizeof(int),1,indice);
 }
 
-// Cria arquivo de indices a partir de um vetor na memoria
+/* Tranfere para o arquivo no disco as informações nas estruturas na memoria */
 void salvarIndice(char *filename, Indice *in) {
 	FILE *fp = fopen(filename,"w+");
 	int validade = INVALIDO;
@@ -29,7 +36,7 @@ void salvarIndice(char *filename, Indice *in) {
 }
 
 
-// Leitura do indice individual do disco para memoria principal
+/*Leitura do indice individual do disco para memoria principal*/
 RegIndice *lerIndice(FILE *indice){
 	RegIndice *reg = (RegIndice*) malloc(sizeof(RegIndice));
 	reg->cnpj = (char*) malloc(sizeof(char) * TAMANHO_CNPJ);
@@ -40,7 +47,7 @@ RegIndice *lerIndice(FILE *indice){
 	return reg;
 }
 
-// recupera indice a partir do arquivo de dados
+/* Recupera um indice corrompido usando o arquivo de dados */
 Indice *recuperarIndice(char *filename) {
 	FILE *fp = fopen(filename, "r");
 	Indice *indice = criarIndice();
@@ -63,7 +70,7 @@ Indice *recuperarIndice(char *filename) {
 	return indice;
 }
 
-// Cria arquivo de indices completo na memoria a partir do indice no disco
+/* Tranfere um indice do disco para memoria, ou cria caso não exista*/
 Indice *carregarIndice(char *filename, char *dataname) {
 	Indice *indice = criarIndice();
 	int count = 0, validade;
@@ -71,7 +78,7 @@ Indice *carregarIndice(char *filename, char *dataname) {
 	FILE *fp = fopen(filename,"r");
 
 	if(fp == NULL){	//se não existe arquivo é porque o projeto é novo
-		printf("Arquivo inexistente, será criado\n");
+		printf("Arquivo de indice inexistente, será criado\n");
 		fp = fopen(filename,"w+"); //ja cria o arquivo para posteriomente ser usado(quando o indice for alterado será alterado o buty de validade)
 		fclose(fp);
 		return indice;	
@@ -106,6 +113,7 @@ Indice *carregarIndice(char *filename, char *dataname) {
 	return indice;
 }
 
+/* Realiza a busca por um CNPJ no indice */
 int buscarIndice(Indice *in, char *cnpj) {
 	int pos,start = 0, end = in->size - 1;
 
@@ -120,7 +128,7 @@ int buscarIndice(Indice *in, char *cnpj) {
 
 }
 
-// Coloca o indice como valido ou invalido. Deve ser utilizado quando ocorrer uma inserçao, remoçao, atualização, ou quando o programa encerrar
+/* Seta o byte de validade no cabeçalho do arquivo */
 void validadeIndice(char *filename, Validade validade) {
 	FILE *indice = fopen(filename,"r+");
 
@@ -130,14 +138,14 @@ void validadeIndice(char *filename, Validade validade) {
 	fclose(indice);
 }
 
-
+/* Função de comparação usada pelo qsort */
 int compararRegIndice(const void *a, const void *b){
 	RegIndice *ra = *(RegIndice **)a;
 	RegIndice *rb = *(RegIndice **)b;
 	return strcmp(ra->cnpj,rb->cnpj);
 }
 
-// Insere no arquivo de indices da memoria
+/*Insere novo indice no vetor de indices*/
 void inserirIndice(Indice *in ,char *cnpj,int offset) {
 	RegIndice *reg = (RegIndice*) malloc(sizeof(RegIndice));
 	reg->cnpj = (char *) malloc(sizeof(char)*TAMANHO_CNPJ);
@@ -150,12 +158,8 @@ void inserirIndice(Indice *in ,char *cnpj,int offset) {
 	qsort(in->indice,in->size,sizeof(RegIndice*),compararRegIndice);
 }
 
-void destruirRegIndice(RegIndice *reg){
-	free(reg->cnpj);
-	free(reg);
-}
 
-// Remove um indice e retorna offset
+/* Remove um indice e retorna offset do registro */
 int removerIndice(Indice *in, char *cnpj) {
 	int pos = buscarIndice(in, cnpj); //procura pelo indice do registro que será removido
 
@@ -174,20 +178,7 @@ int removerIndice(Indice *in, char *cnpj) {
 	return offset; //removido com sucesso
 }
 
-void imprimirIndice(FILE *indice) {
-	RegIndice *r;
-	
-	fseek(indice,0,SEEK_END);
-	int size = (int) ftell(indice);	
-	fseek(indice,0,SEEK_SET);
-	
-	while(size > (int) ftell(indice)){
-		r = lerIndice(indice);
-		printf("%s | %d\n",r->cnpj,r->offset);
-		destruirRegIndice(r);
-	}
-}
-
+/* Desaloca o indice da memoria */
 void destruirIndice(Indice *in) {
 	for (int i = 0; i < in->size; i++)
 		destruirRegIndice(in->indice[i]);
@@ -196,6 +187,7 @@ void destruirIndice(Indice *in) {
 	free(in);
 }
 
+/* Aloca uma estrutura indice */
 Indice *criarIndice(){
 	return (Indice *) calloc(1,sizeof(Indice));
 }

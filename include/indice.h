@@ -16,16 +16,19 @@ typedef enum {
 	VALIDO
 }Validade;
 
+/* Tranfere para o arquivo no disco as informações nas estruturas na memoria */
 void salvarIndice(char *, Indice *);
-Indice *recuperarIndice(char *);
+/* Tranfere um indice do disco para memoria, ou cria caso não exista*/
 Indice *carregarIndice(char *, char *);
-int buscarIndice(Indice *, char *);
+/* Seta o byte de validade no cabeçalho do arquivo */
 void validadeIndice(char*, Validade);
+/*Insere novo indice no vetor de indices*/
 void inserirIndice(Indice *,char *,int );
+/* Remove um indice e retorna offset do registro */
 int removerIndice(Indice *, char *);
-void imprimirIndice(FILE *);
-void destruirRegIndice(RegIndice *);
+/* Desaloca o indice da memoria */
 void destruirIndice(Indice *);
+/* Aloca uma estrutura indice */
 Indice *criarIndice();
 
 #endif

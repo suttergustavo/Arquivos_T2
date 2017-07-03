@@ -54,57 +54,6 @@ void imprimirCompanhia(Companhia *companhia){
 	if(companhia->cnpj_auditoria) printf("CNPJ AUDITORIA: %s\n",companhia->cnpj_auditoria);
 }
 
-/* Retorna um determinado campo de uma companhia */
-char *getCampoCompanhia(Companhia *companhia, Campo campo){
-	if(campo == CNPJ) return companhia->cnpj;
-	if(campo == NOME_SOCIAL) return companhia->nome_social;
-	if(campo == NOME_FANTASIA) return companhia->nome_fantasia;
-	if(campo == DATA_REGISTRO) return companhia->data_registro;
-	if(campo == DATA_CANCELAMENTO) return companhia->data_cancelamento;
-	if(campo == MOTIVO_CANCELAMENTO) return companhia->motivo_cancelamento;
-	if(campo == NOME_EMPRESA) return companhia->nome_empresa;
-	if(campo == CNPJ_AUDITORIA) return companhia->cnpj_auditoria;
-	return NULL;
-}
-
-/* Checa se o uma compania tem um campo igual a uma query */
-int possuiCampoProcurado(Companhia *companhia, Campo campo, char *query){
-	if(campo == CNPJ){
-		if(companhia->cnpj && !strcmp(companhia->cnpj,query)) return 1;
-		return 0;
-	}
-	else if(campo == NOME_SOCIAL){
-		if(companhia->nome_social && !strcmp(companhia->nome_social,query)) return 1;
-		return 0;
-	}
-	else if(campo == NOME_FANTASIA){
-		if(companhia->nome_fantasia && !strcmp(companhia->nome_fantasia,query)) return 1;
-		return 0;	
-	}
-	else if(campo == DATA_REGISTRO){
-		if(companhia->data_registro && !strcmp(companhia->data_registro,query)) return 1;
-		return 0;
-	}
-	else if(campo == DATA_CANCELAMENTO){
-		if(companhia->data_cancelamento && !strcmp(companhia->data_cancelamento,query)) return 1;
-		return 0;
-	}
-	else if(campo == MOTIVO_CANCELAMENTO){
-		if(companhia->motivo_cancelamento && !strcmp(companhia->motivo_cancelamento,query)) return 1;
-		return 0;
-	}
-	else if(campo == NOME_EMPRESA){
-		if(companhia->nome_empresa && !strcmp(companhia->nome_empresa,query)) return 1;
-		return 0;
-	}
-	else if(campo == CNPJ_AUDITORIA){
-		if(companhia->cnpj_auditoria && !strcmp(companhia->cnpj_auditoria,query)) return 1;
-		return 0;
-	}
-	return 0;
-}
-
-
 /* Recebe um ponteiro para arquivo csv e lê um registro */
 Companhia *lerCompanhiaCSV(FILE *input_file){
 	Companhia *nova_companhia = criarCompanhia(1);
@@ -162,31 +111,6 @@ Companhia *lerCompanhiaCSV(FILE *input_file){
 }
 
 
-/* Recebe um nome de arquivo CSV e retorna todos os registros contidos nele */
-Companhia **lerCSVCompleto(char *filename, int *n_companhias){
-	FILE *in;
-	Companhia **companhias = NULL;
-	int end,count = 0;
-	*n_companhias = 0;
-
-	in = fopen(filename,"r");
-	if(in == NULL) return NULL;
-
-	fseek(in,0,SEEK_END);
-	end = (int) ftell(in);
-	fseek(in,0,SEEK_SET);
-
-	while(ftell(in) < end){
-		companhias = (Companhia**) realloc(companhias,sizeof(Companhia*)*(count+1));
-		companhias[count++] = lerCompanhiaCSV(in);
-	}
-
-	fclose(in);
-
-	*n_companhias = count;
-	return companhias;
-}
-
 /* Retorna o tamanho da companhia em bytes(leva em consideração os delimitadores que serão inseridos)*/
 int getTamanhoCompanhia(Companhia *companhia){
 	int tamanho = 0;
@@ -213,6 +137,7 @@ int getTamanhoCompanhia(Companhia *companhia){
 	return tamanho;
 }
 
+/* Le a entrada do usuario para criar nova companhia */
 Companhia *lerCompanhiaIndividual(){
 	Companhia *nova_companhia = criarCompanhia(1);
 

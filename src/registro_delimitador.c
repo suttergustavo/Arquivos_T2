@@ -209,7 +209,7 @@ int escreverCompanhia(char *filename,Companhia *companhia, Estrategia estrategia
 	return offset;
 }
 
-
+/* Salva uma valor em um campo indicado de uma companhia */
 void salvarCampoCompanhia(Companhia* companhia, Campo campo, char *valor){
 	if(campo == CNPJ) companhia->cnpj = valor;
 	if(campo == CNPJ_AUDITORIA) companhia->cnpj_auditoria = valor;
@@ -221,7 +221,7 @@ void salvarCampoCompanhia(Companhia* companhia, Campo campo, char *valor){
 	if(campo == NOME_EMPRESA) companhia->nome_empresa = valor;
 }
 
-/* Lê um registro de um arquivo verificando se o delimitador é um '|' ou um '#' */
+/* Lê um registro de um arquivo de dados, a partir posição desse registro */
 Companhia *lerCompanhia(char *filename ,int offset){
 	char *valor_campo = NULL;
 	char c;
@@ -309,6 +309,7 @@ RegIndice *lerCompanhiaRecuperacao(FILE *fp){
 	return reg;
 }
 
+/* Imprime a lista de reuso de espaço que esta no arquivo de dados*/
 void imprimirListaRemovidos(char *filename,char *label){
 	FILE *fp = fopen(filename,"r");
 	int offset,tamanho,aux;
@@ -321,7 +322,7 @@ void imprimirListaRemovidos(char *filename,char *label){
 	else printf("%s:\n\t",label);
 	while(offset != -1){
 		aux = offset;
-		fseek(fp,offset+sizeof(char),SEEK_SET); //sizeof char para pular o byte dee flag da remoção
+		fseek(fp,offset+sizeof(char),SEEK_SET); //sizeof char para pular o byte de flag da remoção
 		fread(&tamanho,sizeof(int),1,fp);
 		fread(&offset,sizeof(int),1,fp);
 		if(offset != -1) printf("(Tamanho: %4d | Offset: %4d) -> ",tamanho,aux); //caso não seja o ultimo da lista

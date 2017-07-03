@@ -53,19 +53,14 @@ typedef enum{
 
 /* Aloca uma nova estrutura companhia */
 Companhia *criarCompanhia(int);
-/* Retorna um determinado campo de uma companhia */
-char *getCampoCompanhia(Companhia *,Campo);
-/* Recebe um nome de arquivo CSV e retorna todos os registros contidos nele */
-Companhia **lerCSVCompleto(char *,int *);
 /* Desaloca um estrutura companhia da memoria */
 void destruirCompanhia(Companhia*);
 /* Recebe uma estrutura que contem uma companhia e a imprime */
 void imprimirCompanhia(Companhia*);
-/* Checa se o uma compania tem um campo igual a uma query */
-int possuiCampoProcurado(Companhia *, Campo, char *);
 /* Retorna o tamanho da companhia em bytes(leva em consideração os delimitadores que serão inseridos)*/
 int getTamanhoCompanhia(Companhia *);
+/* Le a entrada do usuario para criar nova companhia */
 Companhia *lerCompanhiaIndividual();
-
+/* Recebe um ponteiro para arquivo csv e lê um registro */
 Companhia *lerCompanhiaCSV(FILE *);
 #endif

@@ -14,18 +14,22 @@ Joice Aurino - 8530851
 #include <companhias.h>
 #include <indice.h>
 
+//estrategias de reuso do espaço
 typedef enum {
 	FIRST_FIT,
 	BEST_FIT,
 	WORST_FIT
 }Estrategia;
 
-
+/* Escreve companhia no arquivo de dados e retorna o byte offset */
 int escreverCompanhia(char*,Companhia*,Estrategia);
-void imprimirTodos(char *, Indice*);
+/* Lê um registro de um arquivo de dados, a partir posição desse registro */
 Companhia *lerCompanhia(char *, int);
+/* Remove logicamente um registro e o coloca na lista de removidos*/
 void removerRegistro(char*,int,Estrategia);
+/* Imprime a lista de reuso de espaço que esta no arquivo de dados*/
 void imprimirListaRemovidos(char *,char *);
+/* Função de leitura usada na recuperação de indices corrompidos */
 RegIndice *lerCompanhiaRecuperacao(FILE *);
 
 #endif

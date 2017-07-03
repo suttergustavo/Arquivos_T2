@@ -1,3 +1,13 @@
+/*
+Autores:
+
+Gustavo Sutter - 9763193
+Matheus Gomes - 9779270
+Guilherme Montemovo - 9779461
+Joice Aurino - 8530851
+
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -44,27 +54,31 @@ Projeto *iniciarProjeto(char *nome){
 	return projeto;
 }
 
+/* Insere as companhias de um arquivo csv nos arquivos dados e nos indices */
 void inserirDoCSV(Projeto *projeto, char *arquivo_csv){
 	FILE *csv = fopen(arquivo_csv,"r");
 	Companhia *companhia;
 	int offset;
-
+ 
+ 	//caso o csv não exista
 	if(csv == NULL){
 		printf("Arquivo CSV não encontrado\n");
 		return;
 	}
-
+ 	
 	fseek(csv,0,SEEK_END);
 	int size = (int) ftell(csv);	
 	fseek(csv,0,SEEK_SET);
 	
+	//muda a validade do arquivo de indice, caso nao isso não tenha sido feito
 	if(projeto->alterado == 0){
 		projeto->alterado = 1;
 		validadeIndice(projeto->nome_idx_ff,INVALIDO);
 		validadeIndice(projeto->nome_idx_bf,INVALIDO);
 		validadeIndice(projeto->nome_idx_wf,INVALIDO);
 	}
-
+ 
+ 	//enquanto não está no fim do arquivo
 	while(size > (int) ftell(csv)){
 		companhia = lerCompanhiaCSV(csv);
 
@@ -83,6 +97,7 @@ void inserirDoCSV(Projeto *projeto, char *arquivo_csv){
 	fclose(csv);
 }
 
+/* Remove uma companhia dos arquivos de dados e dos indices*/
 void removerCompanhia(Projeto *projeto, char *cnpj){
 	int offset;
 
@@ -95,6 +110,10 @@ void removerCompanhia(Projeto *projeto, char *cnpj){
 
 	offset = removerIndice(projeto->first_fit,cnpj);
 	if(offset != -1) removerRegistro(projeto->nome_dados_ff,offset,FIRST_FIT);
+	else{//caso não tenha sido encontrado
+		printf("Não foi possivel remover. CNPJ não encontrado\n");
+		return; //pode retornar porque se não está em um indice não está em nenhum
+	}
 
 	offset = removerIndice(projeto->best_fit,cnpj);
 	if(offset != -1) removerRegistro(projeto->nome_dados_bf,offset,BEST_FIT);
@@ -103,6 +122,7 @@ void removerCompanhia(Projeto *projeto, char *cnpj){
 	if(offset != -1) removerRegistro(projeto->nome_dados_wf,offset,WORST_FIT);
 }
 
+/* Insere uma companhia nos arquivos de dados e nos indices */
 void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 	int offset;
 
@@ -121,31 +141,34 @@ void inserirCompanhiaIndividual(Projeto *projeto, Companhia *companhia){
 
 	offset = escreverCompanhia(projeto->nome_dados_wf,companhia,WORST_FIT);
 	inserirIndice(projeto->worst_fit,companhia->cnpj,offset);
-
 }
 
+/* Imprime em formato de tabela os indices */
 void imprimirIndices(Projeto *projeto){
 	printf("---------------------------------------\n");
-	printf("|%19s|%5s|%5s|%5s|\n","CNPJ      ","First","Best","Worst");
+	printf("|%19s|%6s|%6s|%6s|\n","CNPJ      ","First","Best","Worst");
 	printf("---------------------------------------\n");
 	for(int i=0;i<projeto->first_fit->size;i++)
-		printf("|%19s|%5d|%5d|%5d|\n",projeto->first_fit->indice[i]->cnpj,projeto->first_fit->indice[i]->offset,projeto->best_fit->indice[i]->offset,projeto->worst_fit->indice[i]->offset);
+		printf("|%19s|%6d|%6d|%6d|\n",projeto->first_fit->indice[i]->cnpj,projeto->first_fit->indice[i]->offset,projeto->best_fit->indice[i]->offset,projeto->worst_fit->indice[i]->offset);
 	printf("---------------------------------------\n");
 	printf("\n");
 }
 
+/* Imprime as listas de espaços para reuso */
 void imprimirListas(Projeto *projeto){
 	imprimirListaRemovidos(projeto->nome_dados_ff,"First Fit");
 	imprimirListaRemovidos(projeto->nome_dados_bf,"Best Fit");
 	imprimirListaRemovidos(projeto->nome_dados_wf,"Worst Fit");
 }
 
+/* Salva os indices no disco */
 void salvarIndices(Projeto *projeto){
 	salvarIndice(projeto->nome_idx_ff,projeto->first_fit);
 	salvarIndice(projeto->nome_idx_bf,projeto->best_fit);
 	salvarIndice(projeto->nome_idx_wf,projeto->worst_fit);
 }
 
+/* Libera as estruturas do projeto da memoria*/
 void freeProjeto(Projeto *projeto){
 	free(projeto->nome_projeto);
 	free(projeto->nome_dados_ff);
